@@ -482,6 +482,7 @@
                     </div>
                 </div>
 
+                <!-- Lista dinâmica recolhida por padrão (só exibe os itens adicionados) -->
                 <div id="containerLancamentosRubricas"></div>
 
                 <button class="btn-acao" onclick="salvarLancamento()" style="margin-top: 20px; background-color: #0d9488;">💾 Salvar Lançamento no JSONBin</button>
@@ -491,6 +492,10 @@
             <div class="card">
                 <h2>📂 Histórico de Lançamentos Salvos</h2>
                 <div class="form-grid" style="margin-bottom: 15px;">
+                    <div class="form-group">
+                        <label>Filtrar por Ano</label>
+                        <input type="number" id="filtroHistoricoAno" value="2026" placeholder="Ex: 2026" oninput="renderizarHistorico()">
+                    </div>
                     <div class="form-group">
                         <label>Filtrar por Mês</label>
                         <select id="filtroHistoricoMes" onchange="renderizarHistorico()">
@@ -985,15 +990,17 @@
 
     function renderizarHistorico() {
         let tb = document.getElementById('tabelaHistorico');
+        let filtroAno = document.getElementById('filtroHistoricoAno').value;
         let filtroMes = document.getElementById('filtroHistoricoMes').value;
         let filtroNome = document.getElementById('filtroHistoricoNome').value.toLowerCase();
 
         tb.innerHTML = "";
 
         let filtrados = historicoGlobal.filter(h => {
+            let matchAno = filtroAno === "" || h.competencia.includes(filtroAno);
             let matchMes = filtroMes === "" || h.competencia.includes(filtroMes);
             let matchNome = h.nome.toLowerCase().includes(filtroNome);
-            return matchMes && matchNome;
+            return matchAno && matchMes && matchNome;
         });
 
         if(filtrados.length === 0) {
