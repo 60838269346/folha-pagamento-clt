@@ -433,8 +433,8 @@
                                 <option value="Junho">Junho</option>
                                 <option value="Julho">Julho</option>
                                 <option value="Agosto">Agosto</option>
-                                <option value="Setembro" selected>Setembro</option>
-                                <option value="Outubro">Outubro</option>
+                                <option value="Setembro">Setembro</option>
+                                <option value="Outubro" selected>Outubro</option>
                                 <option value="Novembro">Novembro</option>
                                 <option value="Dezembro">Dezembro</option>
                             </select>
@@ -526,4 +526,520 @@
                         </tr>
                     </thead>
                     <tbody id="tabelaHistorico">
-                        <tr><td colspan="5"
+                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Carregando lançamentos...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="card" id="cardResultado">
+                <h2>📄 Demonstrativo de Pagamento (Holerite)</h2>
+                
+                <div class="info-funcionario">
+                    <div>Funcionário: <strong id="outNome">Selecione acima</strong></div>
+                    <div>Competência: <strong id="outCompetencia">Outubro/2026</strong></div>
+                </div>
+
+                <div class="resultado-grid">
+                    <div class="bloco-resumo">
+                        <h3>(+) Proventos (Vencimentos)</h3>
+                        <div class="linha-valor"><span>Salário Base (220h):</span> <span id="resSalarioBase">R$ 0,00</span></div>
+                        <div id="listaResumoProventos"></div>
+                        <div class="linha-valor total"><span>Total de Proventos:</span> <span id="resTotalProventos">R$ 0,00</span></div>
+                    </div>
+
+                    <div class="bloco-resumo">
+                        <h3>(-) Descontos</h3>
+                        <div id="listaResumoDescontos"></div>
+                        <div class="linha-valor"><span>INSS:</span> <span id="resInss">R$ 0,00</span></div>
+                        <div class="linha-valor"><span>IRRF:</span> <span id="resIrrf">R$ 0,00</span></div>
+                        <div class="linha-valor total"><span>Total de Descontos:</span> <span id="resTotalDescontos">R$ 0,00</span></div>
+                    </div>
+                </div>
+
+                <div class="liquido-box">
+                    <h3>Valor Líquido a Receber</h3>
+                    <div class="valor-liquido" id="resValorLiquido">R$ 0,00</div>
+                </div>
+
+                <button class="btn-acao" style="margin-top: 20px; background-color: #059669;" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+            </div>
+        </div>
+
+    </div>
+
+<script>
+    const JSONBIN_BIN_ID = "6aca9655ffd5d160535fdcec";
+    const JSONBIN_API_KEY = "$2a$10$2gRuysiXM85zMZ4OTG2dU.AEaN0WyPHJveZ2wy62/tqidY73EOJBS";
+
+    let funcionarios = JSON.parse(localStorage.getItem('amf_funcionarios')) || [
+        { nome: "Ailton Moraes Furtado", cpf: "000.000.000-00", cargo: "Analista Contábil", salario: 4283.37 }
+    ];
+
+    let rubricas = JSON.parse(localStorage.getItem('amf_rubricas')) || [
+        { num: "001", desc: "SALÁRIO BASE", tipo: "Provento", calculo: "manual", inss: "Sim", irrf: "Sim" },
+        { num: "002", desc: "AJUDA DE CUSTO", tipo: "Provento", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "003", desc: "HORAS EXTRAS 60%", tipo: "Provento", calculo: "he60", inss: "Sim", irrf: "Sim" },
+        { num: "004", desc: "HORAS EXTRAS 100%", tipo: "Provento", calculo: "he100", inss: "Sim", irrf: "Sim" },
+        { num: "005", desc: "DSR HORAS EXTRAS", tipo: "Provento", calculo: "dsr", inss: "Sim", irrf: "Sim" },
+        { num: "006", desc: "FERIADO", tipo: "Provento", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "100", desc: "DESCONTO VALE TRANSPORTE", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "101", desc: "DESC PLANO SAUDE", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "102", desc: "CONSIGNADO 1", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "103", desc: "CONSIGNADO 2", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "104", desc: "CONSIGNADO 3", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "105", desc: "CONSIGNADO 4", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "106", desc: "GYMPASS", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "107", desc: "PLANO ODONTOLOGICO", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "108", desc: "OUTROS DESCONTOS", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" }
+    ];
+    localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+
+    let historicoGlobal = [];
+    let lancamentosAtivos = {};
+
+    window.onload = async function() {
+        atualizarTelas();
+        await carregarHistoricoJsonBin();
+    };
+
+    function mudarAba(abaId, evt) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById('aba-' + abaId).classList.add('active');
+        if(evt) evt.currentTarget.classList.add('active');
+    }
+
+    function adicionarFuncionario() {
+        let nome = document.getElementById('cadNome').value;
+        let cpf = document.getElementById('cadCpf').value;
+        let cargo = document.getElementById('cadCargo').value;
+        let salario = parseFloat(document.getElementById('cadSalario').value) || 0;
+
+        if(!nome) { alert("Informe o nome do funcionário!"); return; }
+
+        funcionarios.push({ nome, cpf, cargo, salario });
+        localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
+        atualizarTelas();
+        alert("Funcionário cadastrado com sucesso!");
+        document.getElementById('cadNome').value = '';
+        document.getElementById('cadCpf').value = '';
+        document.getElementById('cadCargo').value = '';
+    }
+
+    function editarFuncionario(index) {
+        let f = funcionarios[index];
+        let novoNome = prompt("Editar Nome:", f.nome);
+        if(novoNome === null) return;
+        let novoCpf = prompt("Editar CPF:", f.cpf);
+        if(novoCpf === null) return;
+        let novoCargo = prompt("Editar Cargo:", f.cargo);
+        if(novoCargo === null) return;
+        let novoSalario = prompt("Editar Salário Base:", f.salario);
+        if(novoSalario === null) return;
+
+        funcionarios[index] = {
+            nome: novoNome || f.nome,
+            cpf: novoCpf || f.cpf,
+            cargo: novoCargo || f.cargo,
+            salario: parseFloat(novoSalario) || f.salario
+        };
+        localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
+        atualizarTelas();
+        alert("Funcionário atualizado com sucesso!");
+    }
+
+    function excluirFuncionario(index) {
+        funcionarios.splice(index, 1);
+        localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
+        atualizarTelas();
+    }
+
+    function adicionarRubrica() {
+        let num = document.getElementById('rubNum').value;
+        let desc = document.getElementById('rubDesc').value;
+        let tipo = document.getElementById('rubTipo').value;
+        let calculo = document.getElementById('rubCalculo').value;
+        let inss = document.getElementById('rubInss').value;
+        let irrf = document.getElementById('rubIrrf').value;
+
+        if(!num || !desc) { alert("Preencha o número e a descrição da rubrica!"); return; }
+
+        rubricas.push({ num, desc, tipo, calculo, inss, irrf });
+        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+        atualizarTelas();
+        alert("Rubrica cadastrada com sucesso!");
+        document.getElementById('rubNum').value = '';
+        document.getElementById('rubDesc').value = '';
+    }
+
+    function editarRubrica(index) {
+        let r = rubricas[index];
+        let novaDesc = prompt("Editar Descrição:", r.desc);
+        if(novaDesc === null) return;
+
+        rubricas[index].desc = novaDesc || r.desc;
+        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+        atualizarTelas();
+        alert("Rubrica atualizada com sucesso!");
+    }
+
+    function excluirRubrica(index) {
+        rubricas.splice(index, 1);
+        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+        atualizarTelas();
+    }
+
+    function atualizarTelas() {
+        let tbFunc = document.getElementById('tabelaFuncionarios');
+        tbFunc.innerHTML = '';
+        let selectFiltro = document.getElementById('filtroFuncionario');
+        selectFiltro.innerHTML = '<option value="">Selecione o funcionário...</option>';
+
+        funcionarios.forEach((f, index) => {
+            tbFunc.innerHTML += `<tr>
+                <td>${f.nome}</td>
+                <td>${f.cpf || '-'}</td>
+                <td>${f.cargo}</td>
+                <td>R$ ${f.salario.toFixed(2)}</td>
+                <td>
+                    <button onclick="editarFuncionario(${index})" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-right:4px;">Editar</button>
+                    <button onclick="excluirFuncionario(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button>
+                </td>
+            </tr>`;
+            selectFiltro.innerHTML += `<option value="${index}">${f.nome} - ${f.cargo}</option>`;
+        });
+
+        let tbRub = document.getElementById('tabelaRubricas');
+        tbRub.innerHTML = '';
+        rubricas.forEach((r, index) => {
+            tbRub.innerHTML += `<tr>
+                <td>${r.num}</td>
+                <td>${r.desc}</td>
+                <td>${r.tipo}</td>
+                <td>${r.calculo}</td>
+                <td>${r.inss}</td>
+                <td>${r.irrf}</td>
+                <td>
+                    <button onclick="editarRubrica(${index})" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-right:4px;">Editar</button>
+                    <button onclick="excluirRubrica(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button>
+                </td>
+            </tr>`;
+        });
+
+        let selectAddRub = document.getElementById('selectAdicionarRubrica');
+        selectAddRub.innerHTML = '<option value="">Selecione a rubrica...</option>';
+        rubricas.forEach((r, index) => {
+            selectAddRub.innerHTML += `<option value="${index}">${r.num} - ${r.desc} (${r.tipo})</option>`;
+        });
+    }
+
+    function carregarFuncionarioSelecionado() {
+        let idx = document.getElementById('filtroFuncionario').value;
+        if(idx === "") {
+            document.getElementById('lancSalarioBase').value = "";
+            return;
+        }
+        let f = funcionarios[idx];
+        document.getElementById('lancSalarioBase').value = f.salario.toFixed(2);
+        lancamentosAtivos = {};
+        document.getElementById('containerLancamentosRubricas').innerHTML = "";
+        calcularFolha();
+    }
+
+    function adicionarRubricaLancamento() {
+        let idxRub = document.getElementById('selectAdicionarRubrica').value;
+        if(idxRub === "") { alert("Selecione uma rubrica!"); return; }
+        let r = rubricas[idxRub];
+
+        if(lancamentosAtivos[r.num]) { alert("Esta rubrica já foi adicionada!"); return; }
+
+        lancamentosAtivos[r.num] = {
+            desc: r.desc,
+            tipo: r.tipo,
+            calculo: r.calculo,
+            inss: r.inss,
+            irrf: r.irrf,
+            valor: 0,
+            qtdHoras: 0
+        };
+
+        renderizarLancamentosRubricas();
+        calcularFolha();
+    }
+
+    function removerRubricaLancamento(num) {
+        delete lancamentosAtivos[num];
+        renderizarLancamentosRubricas();
+        calcularFolha();
+    }
+
+    function renderizarLancamentosRubricas() {
+        let container = document.getElementById('containerLancamentosRubricas');
+        container.innerHTML = "";
+
+        for(let num in lancamentosAtivos) {
+            let item = lancamentosAtivos[num];
+            let htmlInput = "";
+
+            if(item.calculo === 'manual') {
+                htmlInput = `<div class="form-group" style="flex:1; margin:0;"><label>Valor (R$)</label><input type="number" step="0.01" value="${item.valor}" oninput="atualizarValorRubrica('${num}', this.value)"></div>`;
+            } else {
+                htmlInput = `<div class="form-group" style="flex:1; margin:0;"><label>Quantidade de Horas</label><input type="number" step="0.5" value="${item.qtdHoras}" oninput="atualizarQtdHoras('${num}', this.value)"></div>`;
+            }
+
+            container.innerHTML += `
+                <div style="display: flex; gap: 10px; align-items: center; background: #f1f5f9; padding: 12px; border-radius: 8px; margin-bottom: 10px;">
+                    <div style="flex: 2; font-size: 0.9rem;"><strong>${num} - ${item.desc}</strong> (${item.tipo})</div>
+                    ${htmlInput}
+                    <button onclick="removerRubricaLancamento('${num}')" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; height: 42px; margin-top: 18px;">🗑️</button>
+                </div>
+            `;
+        }
+    }
+
+    function atualizarValorRubrica(num, val) {
+        if(lancamentosAtivos[num]) {
+            lancamentosAtivos[num].valor = parseFloat(val) || 0;
+            calcularFolha();
+        }
+    }
+
+    function atualizarQtdHoras(num, val) {
+        if(lancamentosAtivos[num]) {
+            lancamentosAtivos[num].qtdHoras = parseFloat(val) || 0;
+            calcularFolha();
+        }
+    }
+
+    // Tabela Progressiva Oficial de INSS (2026)
+    function calcularInss(salarioBase) {
+        let inss = 0;
+        if (salarioBase <= 1518.00) {
+            inss = salarioBase * 0.075;
+        } else if (salarioBase <= 2793.88) {
+            inss = (1518.00 * 0.075) + ((salarioBase - 1518.00) * 0.09);
+        } else if (salarioBase <= 4190.83) {
+            inss = (1518.00 * 0.075) + ((2793.88 - 1518.00) * 0.09) + ((salarioBase - 2793.88) * 0.12);
+        } else if (salarioBase <= 7786.02) {
+            inss = (1518.00 * 0.075) + ((2793.88 - 1518.00) * 0.09) + ((4190.83 - 2793.88) * 0.12) + ((salarioBase - 4190.83) * 0.14);
+        } else {
+            inss = 908.85;
+        }
+        return inss;
+    }
+
+    // Tabela de Incidência e Redução Mensal do IRRF 2026 (Isenção efetiva até R$ 5.000,00)
+    function calcularIrrf(baseIrrf) {
+        let irrf = 0;
+        if (baseIrrf <= 5000.00) {
+            irrf = 0;
+        } else if (baseIrrf <= 7350.00) {
+            let impostoBruto = (baseIrrf * 0.275) - 896.00;
+            let reducao = 978.62 - (0.133145 * baseIrrf);
+            irrf = impostoBruto - reducao;
+        } else {
+            irrf = (baseIrrf * 0.275) - 896.00;
+        }
+        return irrf > 0 ? irrf : 0;
+    }
+
+    function calcularFolha() {
+        let salarioBase = parseFloat(document.getElementById('lancSalarioBase').value) || 0;
+        let diasUteis = parseFloat(document.getElementById('lancDiasUteis').value) || 25;
+        let domingos = parseFloat(document.getElementById('lancDomingos').value) || 5;
+
+        let idxFunc = document.getElementById('filtroFuncionario').value;
+        let nomeFunc = idxFunc !== "" ? funcionarios[idxFunc].nome : "Colaborador Não Selecionado";
+        let mes = document.getElementById('lancMes').value;
+        let ano = document.getElementById('lancAno').value;
+
+        document.getElementById('outNome').innerText = nomeFunc;
+        document.getElementById('outCompetencia').innerText = `${mes}/${ano}`;
+        document.getElementById('resSalarioBase').innerText = `R$ ${salarioBase.toFixed(2)}`;
+
+        let totalProventos = salarioBase;
+        let totalDescontos = 0;
+        let baseInss = salarioBase;
+        let baseIrrf = salarioBase;
+
+        let htmlProv = "";
+        let htmlDesc = "";
+
+        let valorHoraNormal = salarioBase / 220;
+
+        for(let num in lancamentosAtivos) {
+            let item = lancamentosAtivos[num];
+            let valorCalculado = item.valor;
+
+            if(item.calculo === 'he60') {
+                valorCalculado = valorHoraNormal * 1.60 * item.qtdHoras;
+                item.valor = valorCalculado;
+            } else if(item.calculo === 'he100') {
+                valorCalculado = valorHoraNormal * 2.00 * item.qtdHoras;
+                item.valor = valorCalculado;
+            } else if(item.calculo === 'dsr') {
+                let totalHE = 0;
+                for(let n in lancamentosAtivos) {
+                    if(lancamentosAtivos[n].calculo === 'he60' || lancamentosAtivos[n].calculo === 'he100') {
+                        totalHE += lancamentosAtivos[n].valor;
+                    }
+                }
+                valorCalculado = diasUteis > 0 ? (totalHE / diasUteis) * domingos : 0;
+                item.valor = valorCalculado;
+            } else if(item.calculo === 'faltas') {
+                valorCalculado = valorHoraNormal * item.qtdHoras;
+                item.valor = valorCalculado;
+            }
+
+            if(item.tipo === 'Provento') {
+                totalProventos += valorCalculado;
+                if(item.inss === 'Sim') baseInss += valorCalculado;
+                if(item.irrf === 'Sim') baseIrrf += valorCalculado;
+                htmlProv += `<div class="linha-valor"><span>${num} - ${item.desc}:</span> <span>R$ ${valorCalculado.toFixed(2)}</span></div>`;
+            } else {
+                totalDescontos += valorCalculado;
+                if(item.inss === 'Sim') baseInss -= valorCalculado;
+                if(item.irrf === 'Sim') baseIrrf -= valorCalculado;
+                htmlDesc += `<div class="linha-valor"><span>${num} - ${item.desc}:</span> <span>R$ ${valorCalculado.toFixed(2)}</span></div>`;
+            }
+        }
+
+        let valorInss = calcularInss(baseInss);
+        let baseIrrfTributavel = baseIrrf - valorInss;
+        let valorIrrf = calcularIrrf(baseIrrfTributavel);
+
+        totalDescontos += valorInss + valorIrrf;
+        let valorLiquido = totalProventos - totalDescontos;
+
+        document.getElementById('listaResumoProventos').innerHTML = htmlProv;
+        document.getElementById('listaResumoDescontos').innerHTML = htmlDesc;
+        document.getElementById('resInss').innerText = `R$ ${valorInss.toFixed(2)}`;
+        document.getElementById('resIrrf').innerText = `R$ ${valorIrrf.toFixed(2)}`;
+        document.getElementById('resTotalProventos').innerText = `R$ ${totalProventos.toFixed(2)}`;
+        document.getElementById('resTotalDescontos').innerText = `R$ ${totalDescontos.toFixed(2)}`;
+        document.getElementById('resValorLiquido').innerText = `R$ ${valorLiquido.toFixed(2)}`;
+    }
+
+    async function carregarHistoricoJsonBin() {
+        try {
+            let response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                headers: { 'X-Master-Key': JSONBIN_API_KEY }
+            });
+            let data = await response.json();
+            historicoGlobal = data.record.historico || [];
+            renderizarHistorico();
+        } catch (error) {
+            console.error("Erro ao carregar do JSONBin:", error);
+            document.getElementById('tabelaHistorico').innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Erro ao carregar dados da nuvem.</td></tr>`;
+        }
+    }
+
+    async function salvarLancamento() {
+        let idxFunc = document.getElementById('filtroFuncionario').value;
+        if(idxFunc === "") { alert("Selecione um funcionário para salvar o lançamento!"); return; }
+
+        let f = funcionarios[idxFunc];
+        let mes = document.getElementById('lancMes').value;
+        let ano = document.getElementById('lancAno').value;
+        let salarioBase = parseFloat(document.getElementById('lancSalarioBase').value) || 0;
+        let liquidoStr = document.getElementById('resValorLiquido').innerText;
+
+        let novoRegistro = {
+            nome: f.nome,
+            competencia: `${mes}/${ano}`,
+            salarioBase: salarioBase,
+            liquido: liquidoStr
+        };
+
+        try {
+            let responseGet = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
+                headers: { 'X-Master-Key': JSONBIN_API_KEY }
+            });
+            let data = await responseGet.json();
+            let listaAtual = data.record.historico || [];
+
+            listaAtual.push(novoRegistro);
+
+            let responsePut = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_API_KEY
+                },
+                body: JSON.stringify({ historico: listaAtual })
+            });
+
+            if (responsePut.ok) {
+                alert("Lançamento salvo com sucesso no JSONBin!");
+                await carregarHistoricoJsonBin();
+            } else {
+                alert("Erro ao salvar no JSONBin.");
+            }
+        } catch (error) {
+            console.error("Erro ao salvar:", error);
+            alert("Falha de conexão ao tentar salvar na nuvem.");
+        }
+    }
+
+    function renderizarHistorico() {
+        let tb = document.getElementById('tabelaHistorico');
+        let filtroMes = document.getElementById('filtroHistoricoMes').value;
+        let filtroNome = document.getElementById('filtroHistoricoNome').value.toLowerCase();
+
+        tb.innerHTML = "";
+
+        let filtrados = historicoGlobal.filter(h => {
+            let matchMes = filtroMes === "" || h.competencia.includes(filtroMes);
+            let matchNome = h.nome.toLowerCase().includes(filtroNome);
+            return matchMes && matchNome;
+        });
+
+        if(filtrados.length === 0) {
+            tb.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Nenhum lançamento encontrado.</td></tr>`;
+            return;
+        }
+
+        filtrados.forEach((h, index) => {
+            tb.innerHTML += `
+                <tr>
+                    <td>${h.nome}</td>
+                    <td>${h.competencia}</td>
+                    <td>R$ ${h.salarioBase.toFixed(2)}</td>
+                    <td><strong>${h.liquido}</strong></td>
+                    <td>
+                        <button onclick="excluirHistoricoNuven(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button>
+                    </td>
+                </tr>
+            `;
+        });
+    }
+
+    async function excluirHistoricoNuven(index) {
+        if(!confirm("Deseja realmente excluir este lançamento do histórico?")) return;
+
+        historicoGlobal.splice(index, 1);
+
+        try {
+            let responsePut = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Master-Key': JSONBIN_API_KEY
+                },
+                body: JSON.stringify({ historico: historicoGlobal })
+            });
+
+            if(responsePut.ok) {
+                alert("Lançamento excluído com sucesso!");
+                renderizarHistorico();
+            } else {
+                alert("Erro ao atualizar o JSONBin.");
+            }
+        } catch(error) {
+            console.error("Erro ao excluir:", error);
+            alert("Falha ao conectar com o JSONBin.");
+        }
+    }
+</script>
+</body>
+</html>
