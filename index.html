@@ -63,6 +63,41 @@
             text-transform: uppercase;
         }
 
+        /* Banner de Imagem na Página Inicial */
+        .banner-inicial {
+            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
+            border-radius: var(--radius);
+            padding: 24px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            color: white;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .banner-inicial img {
+            max-height: 90px;
+            border-radius: 8px;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            background: #ffffff;
+            padding: 4px;
+        }
+
+        .banner-texto h2 {
+            margin: 0 0 6px 0;
+            font-size: 1.25rem;
+            font-weight: 800;
+        }
+
+        .banner-texto p {
+            margin: 0;
+            font-size: 0.85rem;
+            opacity: 0.85;
+        }
+
         /* ABAS DO SISTEMA */
         .tabs {
             display: flex;
@@ -269,8 +304,19 @@
 </head>
 <body>
 
-    <!-- SISTEMA PRINCIPAL SEM TELA DE LOGIN -->
+    <!-- SISTEMA PRINCIPAL SEM SENHA COM IMAGEM DE DESTAQUE -->
     <div class="container" style="padding-top: 10px;">
+        
+        <!-- BANNER COM SUA LOGO/IMAGEM E IDENTIDADE -->
+        <div class="banner-inicial">
+            <div class="banner-texto">
+                <h2>AMF SISTEMA-DP</h2>
+                <p>Ailton Moraes Contador &bull; CRC-MA 015978 &bull; Gestão de Departamento Pessoal</p>
+            </div>
+            <!-- Substitua o link abaixo pela URL da sua imagem/logo se desejar -->
+            <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=300&q=80" alt="AMF Contabilidade">
+        </div>
+
         <header>
             <div>
                 <h1>AMF SISTEMA-DP</h1>
@@ -513,7 +559,6 @@
 
     let lancamentosAtivos = {};
 
-    // Inicializa o sistema direto ao carregar a página
     window.onload = function() {
         atualizarTelas();
         carregarDoJobsIn();
@@ -657,7 +702,7 @@
         let selectRub = document.getElementById('selectAdicionarRubrica');
         selectRub.innerHTML = '<option value="">Selecione a rubrica...</option>';
         rubricas.forEach((r, index) => {
-            if(r.num === "001") return; // Ignora o salário base
+            if(r.num === "001") return; 
             selectRub.innerHTML += `<option value="${index}">${r.num} - ${r.desc} (${r.tipo})</option>`;
         });
     }
@@ -800,7 +845,6 @@
 
         let valorTotalHorasExtras = 0;
 
-        // 1ª Passada: Calcula o valor total das horas extras para base do DSR
         Object.keys(lancamentosAtivos).forEach(indexRub => {
             let r = rubricas[indexRub];
             if(r && (r.calculo === "he60" || r.calculo === "he100")) {
@@ -816,7 +860,6 @@
         let htmlProventos = "";
         let htmlDescontos = "";
 
-        // 2ª Passada: Calcula todas as rubricas ativas
         Object.keys(lancamentosAtivos).forEach(indexRub => {
             let r = rubricas[indexRub];
             if(!r) return;
