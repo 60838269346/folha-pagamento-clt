@@ -29,7 +29,7 @@
             padding: 24px 16px;
         }
 
-        /* TELA DE LOGIN */
+        /* TELA DE LOGIN FIXA COM SENHA 0 */
         #telaLogin {
             position: fixed;
             top: 0;
@@ -435,7 +435,7 @@
                         </div>
                         <div class="form-group">
                             <label>Descrição</label>
-                            <input type="text" id="rubDesc" placeholder="Ex: Horas Extras 50%">
+                            <input type="text" id="rubDesc" placeholder="Ex: Horas Extras 60%">
                         </div>
                         <div class="form-group">
                             <label>Tipo</label>
@@ -448,7 +448,7 @@
                             <label>Fórmula / Cálculo Automático</label>
                             <select id="rubCalculo">
                                 <option value="manual">Valor Fixo em R$</option>
-                                <option value="he50">Hora Extra 50% (Qtd Horas)</option>
+                                <option value="he60">Hora Extra 60% (Qtd Horas)</option>
                                 <option value="he100">Hora Extra 100% (Qtd Horas)</option>
                                 <option value="faltas">Falta / Atraso (Qtd Horas)</option>
                             </select>
@@ -555,7 +555,7 @@
 
     let rubricas = JSON.parse(localStorage.getItem('amf_rubricas')) || [
         { num: "001", desc: "Salário Base", tipo: "Provento", calculo: "manual", inss: "Sim", irrf: "Sim" },
-        { num: "002", desc: "Horas Extras 50%", tipo: "Provento", calculo: "he50", inss: "Sim", irrf: "Sim" },
+        { num: "002", desc: "Horas Extras 60%", tipo: "Provento", calculo: "he60", inss: "Sim", irrf: "Sim" },
         { num: "003", desc: "Faltas / Atrasos", tipo: "Desconto", calculo: "faltas", inss: "Nao", irrf: "Nao" }
     ];
 
@@ -583,6 +583,16 @@
         if(evt) evt.currentTarget.classList.add('active');
     }
 
+    function validarSenhaAcao() {
+        let senha = prompt("Digite a senha para autorizar esta ação:");
+        if (senha === "0") {
+            return true;
+        } else if (senha !== null) {
+            alert("Senha incorreta! Ação cancelada.");
+        }
+        return false;
+    }
+
     function adicionarFuncionario() {
         let nome = document.getElementById('cadNome').value;
         let cpf = document.getElementById('cadCpf').value;
@@ -600,7 +610,31 @@
         document.getElementById('cadCargo').value = '';
     }
 
+    function editarFuncionario(index) {
+        if(!validarSenhaAcao()) return;
+        let f = funcionarios[index];
+        let novoNome = prompt("Editar Nome:", f.nome);
+        if(novoNome === null) return;
+        let novoCpf = prompt("Editar CPF:", f.cpf);
+        if(novoCpf === null) return;
+        let novoCargo = prompt("Editar Cargo:", f.cargo);
+        if(novoCargo === null) return;
+        let novoSalario = prompt("Editar Salário Base:", f.salario);
+        if(novoSalario === null) return;
+
+        funcionarios[index] = {
+            nome: novoNome || f.nome,
+            cpf: novoCpf || f.cpf,
+            cargo: novoCargo || f.cargo,
+            salario: parseFloat(novoSalario) || f.salario
+        };
+        localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
+        atualizarTelas();
+        alert("Funcionário atualizado com sucesso!");
+    }
+
     function excluirFuncionario(index) {
+        if(!validarSenhaAcao()) return;
         funcionarios.splice(index, 1);
         localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
         atualizarTelas();
@@ -624,7 +658,20 @@
         document.getElementById('rubDesc').value = '';
     }
 
+    function editarRubrica(index) {
+        if(!validarSenhaAcao()) return;
+        let r = rubricas[index];
+        let novaDesc = prompt("Editar Descrição:", r.desc);
+        if(novaDesc === null) return;
+
+        rubricas[index].desc = novaDesc || r.desc;
+        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+        atualizarTelas();
+        alert("Rubrica atualizada com sucesso!");
+    }
+
     function excluirRubrica(index) {
+        if(!validarSenhaAcao()) return;
         rubricas.splice(index, 1);
         localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
         atualizarTelas();
@@ -642,7 +689,10 @@
                 <td>${f.cpf || '-'}</td>
                 <td>${f.cargo}</td>
                 <td>R$ ${f.salario.toFixed(2)}</td>
-                <td><button onclick="excluirFuncionario(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button></td>
+                <td>
+                    <button onclick="editarFuncionario(${index})" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-right:4px;">Editar</button>
+                    <button onclick="excluirFuncionario(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button>
+                </td>
             </tr>`;
             selectFiltro.innerHTML += `<option value="${index}">${f.nome} - ${f.cargo}</option>`;
         });
@@ -651,7 +701,7 @@
         tbRub.innerHTML = '';
         rubricas.forEach((r, index) => {
             let nomeCalculo = "Valor Fixo (R$)";
-            if(r.calculo === "he50") nomeCalculo = "Hora Extra 50% (Qtd Horas)";
+            if(r.calculo === "he60") nomeCalculo = "Hora Extra 60% (Qtd Horas)";
             if(r.calculo === "he100") nomeCalculo = "Hora Extra 100% (Qtd Horas)";
             if(r.calculo === "faltas") nomeCalculo = "Faltas / Atrasos (Qtd Horas)";
 
@@ -662,7 +712,10 @@
                 <td>${nomeCalculo}</td>
                 <td>${r.inss}</td>
                 <td>${r.irrf}</td>
-                <td><button onclick="excluirRubrica(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button></td>
+                <td>
+                    <button onclick="editarRubrica(${index})" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-right:4px;">Editar</button>
+                    <button onclick="excluirRubrica(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button>
+                </td>
             </tr>`;
         });
 
@@ -677,7 +730,7 @@
             if(r.num === "001") return;
 
             let rotulo = `Valor (R$) para ${r.desc} (${r.tipo})`;
-            if(r.calculo === "he50" || r.calculo === "he100" || r.calculo === "faltas") {
+            if(r.calculo === "he60" || r.calculo === "he100" || r.calculo === "faltas") {
                 rotulo = `Qtd de Horas para: ${r.desc}`;
             }
 
@@ -762,8 +815,8 @@
             let valorDigitado = parseFloat(inputEl.value) || 0;
             let valorCalculado = 0;
 
-            if(r.calculo === "he50") {
-                valorCalculado = valorDigitado * (valorHora * 1.5);
+            if(r.calculo === "he60") {
+                valorCalculado = valorDigitado * (valorHora * 1.6);
             } else if(r.calculo === "he100") {
                 valorCalculado = valorDigitado * (valorHora * 2.0);
             } else if(r.calculo === "faltas") {
