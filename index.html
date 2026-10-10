@@ -29,6 +29,90 @@
             padding: 24px 16px;
         }
 
+        /* TELA DE LOGIN COM SENHA 0 */
+        #telaLogin {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(rgba(15, 23, 42, 0.75), rgba(15, 23, 42, 0.85)), url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 16px;
+        }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(12px);
+            padding: 36px 32px;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .login-card h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 6px;
+            font-weight: 800;
+        }
+
+        .login-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: 16px;
+            background: #fff;
+            box-sizing: border-box;
+            letter-spacing: 2px;
+        }
+
+        .login-card button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .login-card button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .erro-senha {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            display: none;
+            font-weight: 600;
+        }
+
+        /* SISTEMA PRINCIPAL (OCULTO ATÉ DIGITAR A SENHA) */
+        #sistemaPrincipal {
+            display: none;
+        }
+
         .container {
             max-width: 1000px;
             margin: 0 auto;
@@ -61,41 +145,6 @@
             border-radius: 20px;
             font-weight: 700;
             text-transform: uppercase;
-        }
-
-        /* Banner de Imagem na Página Inicial */
-        .banner-inicial {
-            background: linear-gradient(135deg, #1e3a8a 0%, #1e40af 100%);
-            border-radius: var(--radius);
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            color: white;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .banner-inicial img {
-            max-height: 90px;
-            border-radius: 8px;
-            border: 2px solid rgba(255, 255, 255, 0.3);
-            background: #ffffff;
-            padding: 4px;
-        }
-
-        .banner-texto h2 {
-            margin: 0 0 6px 0;
-            font-size: 1.25rem;
-            font-weight: 800;
-        }
-
-        .banner-texto p {
-            margin: 0;
-            font-size: 0.85rem;
-            opacity: 0.85;
         }
 
         /* ABAS DO SISTEMA */
@@ -304,242 +353,244 @@
 </head>
 <body>
 
-    <!-- SISTEMA PRINCIPAL SEM SENHA COM IMAGEM DE DESTAQUE -->
-    <div class="container" style="padding-top: 10px;">
-        
-        <!-- BANNER COM SUA LOGO/IMAGEM E IDENTIDADE -->
-        <div class="banner-inicial">
-            <div class="banner-texto">
-                <h2>AMF SISTEMA-DP</h2>
-                <p>Ailton Moraes Contador &bull; CRC-MA 015978 &bull; Gestão de Departamento Pessoal</p>
-            </div>
-            <!-- Substitua o link abaixo pela URL da sua imagem/logo se desejar -->
-            <img src="https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=300&q=80" alt="AMF Contabilidade">
+    <!-- TELA DE LOGIN PROTEGIDA POR SENHA 0 -->
+    <div id="telaLogin">
+        <div class="login-card">
+            <h2>AMF SISTEMA-DP</h2>
+            <p>Sistema de Departamento Pessoal</p>
+            <input type="password" id="inputSenha" placeholder="Digite sua senha" onkeypress="checarEnter(event)" autofocus>
+            <button onclick="verificarSenha()">Entrar no Sistema</button>
+            <div id="msgErro" class="erro-senha">Senha incorreta! Tente novamente.</div>
         </div>
+    </div>
 
-        <header>
-            <div>
-                <h1>AMF SISTEMA-DP</h1>
-                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Gestão de Departamento Pessoal &bull; Base 220h</div>
-            </div>
-            <div class="badge-sistema">Ativo</div>
-        </header>
-
-        <!-- ABAS DE NAVEGAÇÃO -->
-        <div class="tabs">
-            <button class="tab-btn active" onclick="mudarAba('funcionarios', event)">1. Funcionários</button>
-            <button class="tab-btn" onclick="mudarAba('rubricas', event)">2. Rubricas</button>
-            <button class="tab-btn" onclick="mudarAba('lancamentos', event)">3. Lançamentos & Holerite</button>
-        </div>
-
-        <!-- ABA 1: FUNCIONÁRIOS -->
-        <div id="aba-funcionarios" class="tab-content active">
-            <div class="card">
-                <h2>👥 Cadastro de Funcionários</h2>
-                <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label>Nome Completo</label>
-                        <input type="text" id="cadNome" placeholder="Ex: João da Silva">
-                    </div>
-                    <div class="form-group">
-                        <label>CPF</label>
-                        <input type="text" id="cadCpf" placeholder="000.000.000-00">
-                    </div>
-                    <div class="form-group">
-                        <label>Cargo / Função</label>
-                        <input type="text" id="cadCargo" placeholder="Ex: Analista">
-                    </div>
-                    <div class="form-group">
-                        <label>Salário Base (R$)</label>
-                        <input type="number" id="cadSalario" step="0.01" value="2200.00">
-                    </div>
+    <!-- SISTEMA PRINCIPAL -->
+    <div id="sistemaPrincipal">
+        <div class="container">
+            <header>
+                <div>
+                    <h1>AMF SISTEMA-DP</h1>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Gestão de Departamento Pessoal &bull; Base 220h</div>
                 </div>
-                <button class="btn-acao" onclick="adicionarFuncionario()">➕ Cadastrar Funcionário</button>
+                <div class="badge-sistema">Ativo</div>
+            </header>
+
+            <!-- ABAS DE NAVEGAÇÃO -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="mudarAba('funcionarios', event)">1. Funcionários</button>
+                <button class="tab-btn" onclick="mudarAba('rubricas', event)">2. Rubricas</button>
+                <button class="tab-btn" onclick="mudarAba('lancamentos', event)">3. Lançamentos & Holerite</button>
             </div>
 
-            <div class="card">
-                <h2>📋 Funcionários Cadastrados</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Nome</th>
-                            <th>CPF</th>
-                            <th>Cargo</th>
-                            <th>Salário Base</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaFuncionarios"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ABA 2: RUBRICAS -->
-        <div id="aba-rubricas" class="tab-content">
-            <div class="card">
-                <h2>⚙️ Cadastro de Rubricas</h2>
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Número da Rubrica</label>
-                        <input type="text" id="rubNum" placeholder="Ex: 004">
+            <!-- ABA 1: FUNCIONÁRIOS -->
+            <div id="aba-funcionarios" class="tab-content active">
+                <div class="card">
+                    <h2>👥 Cadastro de Funcionários</h2>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Nome Completo</label>
+                            <input type="text" id="cadNome" placeholder="Ex: João da Silva">
+                        </div>
+                        <div class="form-group">
+                            <label>CPF</label>
+                            <input type="text" id="cadCpf" placeholder="000.000.000-00">
+                        </div>
+                        <div class="form-group">
+                            <label>Cargo / Função</label>
+                            <input type="text" id="cadCargo" placeholder="Ex: Analista">
+                        </div>
+                        <div class="form-group">
+                            <label>Salário Base (R$)</label>
+                            <input type="number" id="cadSalario" step="0.01" value="2200.00">
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Descrição</label>
-                        <input type="text" id="rubDesc" placeholder="Ex: DSR sobre Horas Extras">
-                    </div>
-                    <div class="form-group">
-                        <label>Tipo</label>
-                        <select id="rubTipo">
-                            <option value="Provento">Provento (+)</option>
-                            <option value="Desconto">Desconto (-)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Fórmula / Cálculo Automático</label>
-                        <select id="rubCalculo">
-                            <option value="manual">Valor Fixo em R$</option>
-                            <option value="he60">Hora Extra 60% (Qtd Horas)</option>
-                            <option value="he100">Hora Extra 100% (Qtd Horas)</option>
-                            <option value="dsr">DSR Automático sobre Horas Extras</option>
-                            <option value="faltas">Falta / Atraso (Qtd Horas)</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label>Incidir INSS</label>
-                        <select id="rubInss"><option value="Sim">Sim</option><option value="Nao">Não</option></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Incidir IRRF</label>
-                        <select id="rubIrrf"><option value="Sim">Sim</option><option value="Nao">Não</option></select>
-                    </div>
+                    <button class="btn-acao" onclick="adicionarFuncionario()">➕ Cadastrar Funcionário</button>
                 </div>
-                <button class="btn-acao" onclick="adicionarRubrica()">➕ Cadastrar Rubrica</button>
+
+                <div class="card">
+                    <h2>📋 Funcionários Cadastrados</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>Cargo</th>
+                                <th>Salário Base</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaFuncionarios"></tbody>
+                    </table>
+                </div>
             </div>
 
-            <div class="card">
-                <h2>📑 Tabela de Rubricas</h2>
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Núm</th>
-                            <th>Descrição</th>
-                            <th>Tipo</th>
-                            <th>Regra de Cálculo</th>
-                            <th>INSS</th>
-                            <th>IRRF</th>
-                            <th>Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaRubricas"></tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- ABA 3: LANÇAMENTOS E HOLERITE -->
-        <div id="aba-lancamentos" class="tab-content">
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2 style="margin: 0;">📊 Lançamento da Folha</h2>
-                    <div style="display: flex; gap: 10px; align-items: center;">
-                        <div class="form-group" style="margin:0;">
-                            <label style="font-size: 0.65rem;">Mês</label>
-                            <select id="lancMes" style="padding: 6px 10px;">
-                                <option value="Janeiro">Janeiro</option>
-                                <option value="Fevereiro">Fevereiro</option>
-                                <option value="Março">Março</option>
-                                <option value="Abril">Abril</option>
-                                <option value="Maio">Maio</option>
-                                <option value="Junho">Junho</option>
-                                <option value="Julho">Julho</option>
-                                <option value="Agosto">Agosto</option>
-                                <option value="Setembro">Setembro</option>
-                                <option value="Outubro" selected>Outubro</option>
-                                <option value="Novembro">Novembro</option>
-                                <option value="Dezembro">Dezembro</option>
+            <!-- ABA 2: RUBRICAS -->
+            <div id="aba-rubricas" class="tab-content">
+                <div class="card">
+                    <h2>⚙️ Cadastro de Rubricas</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Número da Rubrica</label>
+                            <input type="text" id="rubNum" placeholder="Ex: 004">
+                        </div>
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <input type="text" id="rubDesc" placeholder="Ex: DSR sobre Horas Extras">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <select id="rubTipo">
+                                <option value="Provento">Provento (+)</option>
+                                <option value="Desconto">Desconto (-)</option>
                             </select>
                         </div>
-                        <div class="form-group" style="margin:0; width: 90px;">
-                            <label style="font-size: 0.65rem;">Ano</label>
-                            <input type="number" id="lancAno" value="2026" style="padding: 6px 10px;">
+                        <div class="form-group">
+                            <label>Fórmula / Cálculo Automático</label>
+                            <select id="rubCalculo">
+                                <option value="manual">Valor Fixo em R$</option>
+                                <option value="he60">Hora Extra 60% (Qtd Horas)</option>
+                                <option value="he100">Hora Extra 100% (Qtd Horas)</option>
+                                <option value="dsr">DSR Automático sobre Horas Extras</option>
+                                <option value="faltas">Falta / Atraso (Qtd Horas)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Incidir INSS</label>
+                            <select id="rubInss"><option value="Sim">Sim</option><option value="Nao">Não</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Incidir IRRF</label>
+                            <select id="rubIrrf"><option value="Sim">Sim</option><option value="Nao">Não</option></select>
                         </div>
                     </div>
+                    <button class="btn-acao" onclick="adicionarRubrica()">➕ Cadastrar Rubrica</button>
                 </div>
 
-                <div class="form-group full-width" style="margin-bottom: 16px;">
-                    <label>Selecionar Funcionário</label>
-                    <select id="filtroFuncionario" onchange="carregarFuncionarioSelecionado()">
-                        <option value="">Selecione o funcionário...</option>
-                    </select>
+                <div class="card">
+                    <h2>📑 Tabela de Rubricas</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Núm</th>
+                                <th>Descrição</th>
+                                <th>Tipo</th>
+                                <th>Regra de Cálculo</th>
+                                <th>INSS</th>
+                                <th>IRRF</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaRubricas"></tbody>
+                    </table>
                 </div>
+            </div>
 
-                <div class="form-grid">
-                    <div class="form-group">
-                        <label>Salário Base (R$)</label>
-                        <input type="number" id="lancSalarioBase" step="0.01" oninput="calcularFolha()">
+            <!-- ABA 3: LANÇAMENTOS E HOLERITE -->
+            <div id="aba-lancamentos" class="tab-content">
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h2 style="margin: 0;">📊 Lançamento da Folha</h2>
+                        <div style="display: flex; gap: 10px; align-items: center;">
+                            <div class="form-group" style="margin:0;">
+                                <label style="font-size: 0.65rem;">Mês</label>
+                                <select id="lancMes" style="padding: 6px 10px;">
+                                    <option value="Janeiro">Janeiro</option>
+                                    <option value="Fevereiro">Fevereiro</option>
+                                    <option value="Março">Março</option>
+                                    <option value="Abril">Abril</option>
+                                    <option value="Maio">Maio</option>
+                                    <option value="Junho">Junho</option>
+                                    <option value="Julho">Julho</option>
+                                    <option value="Agosto">Agosto</option>
+                                    <option value="Setembro">Setembro</option>
+                                    <option value="Outubro" selected>Outubro</option>
+                                    <option value="Novembro">Novembro</option>
+                                    <option value="Dezembro">Dezembro</option>
+                                </select>
+                            </div>
+                            <div class="form-group" style="margin:0; width: 90px;">
+                                <label style="font-size: 0.65rem;">Ano</label>
+                                <input type="number" id="lancAno" value="2026" style="padding: 6px 10px;">
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label>Dias Úteis do Mês (Para DSR)</label>
-                        <input type="number" id="lancDiasUteis" value="25" oninput="calcularFolha()">
-                    </div>
-                    <div class="form-group">
-                        <label>Domingos e Feriados (Para DSR)</label>
-                        <input type="number" id="lancDomingos" value="5" oninput="calcularFolha()">
-                    </div>
-                </div>
 
-                <h3 style="font-size: 0.9rem; margin-top: 20px; color: var(--primary);">Lançamento Dinâmico por Rubrica</h3>
-                
-                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                    <div class="form-group" style="flex: 1; margin: 0;">
-                        <label>Selecionar Rubrica para Lançar</label>
-                        <select id="selectAdicionarRubrica">
-                            <option value="">Selecione a rubrica...</option>
+                    <div class="form-group full-width" style="margin-bottom: 16px;">
+                        <label>Selecionar Funcionário</label>
+                        <select id="filtroFuncionario" onchange="carregarFuncionarioSelecionado()">
+                            <option value="">Selecione o funcionário...</option>
                         </select>
                     </div>
-                    <div style="display: flex; align-items: flex-end;">
-                        <button class="btn-acao" onclick="adicionarRubricaLancamento()" style="margin: 0; padding: 11px 20px;">➕ Adicionar</button>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Salário Base (R$)</label>
+                            <input type="number" id="lancSalarioBase" step="0.01" oninput="calcularFolha()">
+                        </div>
+                        <div class="form-group">
+                            <label>Dias Úteis do Mês (Para DSR)</label>
+                            <input type="number" id="lancDiasUteis" value="25" oninput="calcularFolha()">
+                        </div>
+                        <div class="form-group">
+                            <label>Domingos e Feriados (Para DSR)</label>
+                            <input type="number" id="lancDomingos" value="5" oninput="calcularFolha()">
+                        </div>
                     </div>
+
+                    <h3 style="font-size: 0.9rem; margin-top: 20px; color: var(--primary);">Lançamento Dinâmico por Rubrica</h3>
+                    
+                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                        <div class="form-group" style="flex: 1; margin: 0;">
+                            <label>Selecionar Rubrica para Lançar</label>
+                            <select id="selectAdicionarRubrica">
+                                <option value="">Selecione a rubrica...</option>
+                            </select>
+                        </div>
+                        <div style="display: flex; align-items: flex-end;">
+                            <button class="btn-acao" onclick="adicionarRubricaLancamento()" style="margin: 0; padding: 11px 20px;">➕ Adicionar</button>
+                        </div>
+                    </div>
+
+                    <div id="containerLancamentosRubricas"></div>
+
+                    <button class="btn-acao btn-jobs" onclick="salvarNoJobsIn()" style="margin-top: 20px;">☁️ Salvar Dados no JSONBin</button>
                 </div>
 
-                <div id="containerLancamentosRubricas"></div>
+                <div class="card" id="cardResultado">
+                    <h2>📄 Demonstrativo de Pagamento (Holerite)</h2>
+                    
+                    <div class="info-funcionario">
+                        <div>Funcionário: <strong id="outNome">Selecione acima</strong></div>
+                        <div>Competência: <strong id="outCompetencia">Outubro/2026</strong></div>
+                    </div>
 
-                <button class="btn-acao btn-jobs" onclick="salvarNoJobsIn()" style="margin-top: 20px;">☁️ Salvar Dados no JSONBin</button>
+                    <div class="resultado-grid">
+                        <div class="bloco-resumo">
+                            <h3>(+) Proventos (Vencimentos)</h3>
+                            <div class="linha-valor"><span>Salário Base (220h):</span> <span id="resSalarioBase">R$ 0,00</span></div>
+                            <div id="listaResumoProventos"></div>
+                            <div class="linha-valor total"><span>Total de Proventos:</span> <span id="resTotalProventos">R$ 0,00</span></div>
+                        </div>
+
+                        <div class="bloco-resumo">
+                            <h3>(-) Descontos</h3>
+                            <div id="listaResumoDescontos"></div>
+                            <div class="linha-valor"><span>INSS:</span> <span id="resInss">R$ 0,00</span></div>
+                            <div class="linha-valor"><span>IRRF:</span> <span id="resIrrf">R$ 0,00</span></div>
+                            <div class="linha-valor total"><span>Total de Descontos:</span> <span id="resTotalDescontos">R$ 0,00</span></div>
+                        </div>
+                    </div>
+
+                    <div class="liquido-box">
+                        <h3>Valor Líquido a Receber</h3>
+                        <div class="valor-liquido" id="resValorLiquido">R$ 0,00</div>
+                    </div>
+
+                    <button class="btn-acao" style="margin-top: 20px; background-color: #059669;" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+                </div>
             </div>
 
-            <div class="card" id="cardResultado">
-                <h2>📄 Demonstrativo de Pagamento (Holerite)</h2>
-                
-                <div class="info-funcionario">
-                    <div>Funcionário: <strong id="outNome">Selecione acima</strong></div>
-                    <div>Competência: <strong id="outCompetencia">Outubro/2026</strong></div>
-                </div>
-
-                <div class="resultado-grid">
-                    <div class="bloco-resumo">
-                        <h3>(+) Proventos (Vencimentos)</h3>
-                        <div class="linha-valor"><span>Salário Base (220h):</span> <span id="resSalarioBase">R$ 0,00</span></div>
-                        <div id="listaResumoProventos"></div>
-                        <div class="linha-valor total"><span>Total de Proventos:</span> <span id="resTotalProventos">R$ 0,00</span></div>
-                    </div>
-
-                    <div class="bloco-resumo">
-                        <h3>(-) Descontos</h3>
-                        <div id="listaResumoDescontos"></div>
-                        <div class="linha-valor"><span>INSS:</span> <span id="resInss">R$ 0,00</span></div>
-                        <div class="linha-valor"><span>IRRF:</span> <span id="resIrrf">R$ 0,00</span></div>
-                        <div class="linha-valor total"><span>Total de Descontos:</span> <span id="resTotalDescontos">R$ 0,00</span></div>
-                    </div>
-                </div>
-
-                <div class="liquido-box">
-                    <h3>Valor Líquido a Receber</h3>
-                    <div class="valor-liquido" id="resValorLiquido">R$ 0,00</div>
-                </div>
-
-                <button class="btn-acao" style="margin-top: 20px; background-color: #059669;" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
-            </div>
         </div>
-
     </div>
 
 <script>
@@ -559,16 +610,39 @@
 
     let lancamentosAtivos = {};
 
-    window.onload = function() {
-        atualizarTelas();
-        carregarDoJobsIn();
-    };
+    function verificarSenha() {
+        let inputEl = document.getElementById('inputSenha');
+        let senha = inputEl.value.toString().trim();
+        if (senha === "0") {
+            document.getElementById('telaLogin').style.display = 'none';
+            document.getElementById('sistemaPrincipal').style.display = 'block';
+            atualizarTelas();
+            carregarDoJobsIn();
+        } else {
+            document.getElementById('msgErro').style.display = 'block';
+            inputEl.value = '';
+        }
+    }
+
+    function checarEnter(event) {
+        if (event.key === 'Enter') verificarSenha();
+    }
 
     function mudarAba(abaId, evt) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
         document.getElementById('aba-' + abaId).classList.add('active');
         if(evt) evt.currentTarget.classList.add('active');
+    }
+
+    function validarSenhaAcao() {
+        let senha = prompt("Digite a senha para autorizar esta ação:");
+        if (senha === "0") {
+            return true;
+        } else if (senha !== null) {
+            alert("Senha incorreta! Ação cancelada.");
+        }
+        return false;
     }
 
     function adicionarFuncionario() {
@@ -589,6 +663,7 @@
     }
 
     function editarFuncionario(index) {
+        if(!validarSenhaAcao()) return;
         let f = funcionarios[index];
         let novoNome = prompt("Editar Nome:", f.nome);
         if(novoNome === null) return;
@@ -611,6 +686,7 @@
     }
 
     function excluirFuncionario(index) {
+        if(!validarSenhaAcao()) return;
         funcionarios.splice(index, 1);
         localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
         atualizarTelas();
@@ -635,6 +711,7 @@
     }
 
     function editarRubrica(index) {
+        if(!validarSenhaAcao()) return;
         let r = rubricas[index];
         let novaDesc = prompt("Editar Descrição:", r.desc);
         if(novaDesc === null) return;
@@ -646,6 +723,7 @@
     }
 
     function excluirRubrica(index) {
+        if(!validarSenhaAcao()) return;
         rubricas.splice(index, 1);
         localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
         atualizarTelas();
