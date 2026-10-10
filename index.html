@@ -29,90 +29,6 @@
             padding: 24px 16px;
         }
 
-        /* TELA DE LOGIN FIXA COM SENHA 0 */
-        #telaLogin {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.8)), url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1920&q=80') no-repeat center center;
-            background-size: cover;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            padding: 16px;
-        }
-
-        .login-card {
-            background: rgba(255, 255, 255, 0.96);
-            backdrop-filter: blur(12px);
-            padding: 36px 32px;
-            border-radius: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            width: 100%;
-            max-width: 400px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-        .login-card h2 {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 6px;
-            font-weight: 800;
-        }
-
-        .login-card p {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 24px;
-        }
-
-        .login-card input {
-            width: 100%;
-            padding: 12px 14px;
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            font-size: 1.1rem;
-            text-align: center;
-            margin-bottom: 16px;
-            background: #fff;
-            box-sizing: border-box;
-            letter-spacing: 2px;
-        }
-
-        .login-card button {
-            width: 100%;
-            padding: 12px;
-            background-color: var(--primary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 1rem;
-            cursor: pointer;
-            transition: background 0.2s;
-        }
-
-        .login-card button:hover {
-            background-color: var(--primary-hover);
-        }
-
-        .erro-senha {
-            color: #ef4444;
-            font-size: 0.85rem;
-            margin-top: 12px;
-            display: none;
-            font-weight: 600;
-        }
-
-        /* SISTEMA PRINCIPAL */
-        #sistemaPrincipal {
-            display: none;
-        }
-
         .container {
             max-width: 1000px;
             margin: 0 auto;
@@ -353,244 +269,231 @@
 </head>
 <body>
 
-    <!-- TELA DE LOGIN FIXA COM SENHA 0 -->
-    <div id="telaLogin">
-        <div class="login-card">
-            <h2>AMF SISTEMA-DP</h2>
-            <p>Sistema de Departamento Pessoal</p>
-            <input type="text" id="inputSenha" placeholder="Digite sua senha" onkeypress="checarEnter(event)" autofocus>
-            <button onclick="verificarSenha()">Entrar no Sistema</button>
-            <div id="msgErro" class="erro-senha">Senha incorreta! Tente novamente.</div>
+    <!-- SISTEMA PRINCIPAL SEM TELA DE LOGIN -->
+    <div class="container" style="padding-top: 10px;">
+        <header>
+            <div>
+                <h1>AMF SISTEMA-DP</h1>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Gestão de Departamento Pessoal &bull; Base 220h</div>
+            </div>
+            <div class="badge-sistema">Ativo</div>
+        </header>
+
+        <!-- ABAS DE NAVEGAÇÃO -->
+        <div class="tabs">
+            <button class="tab-btn active" onclick="mudarAba('funcionarios', event)">1. Funcionários</button>
+            <button class="tab-btn" onclick="mudarAba('rubricas', event)">2. Rubricas</button>
+            <button class="tab-btn" onclick="mudarAba('lancamentos', event)">3. Lançamentos & Holerite</button>
         </div>
-    </div>
 
-    <!-- SISTEMA PRINCIPAL -->
-    <div id="sistemaPrincipal">
-        <div class="container">
-            <header>
-                <div>
-                    <h1>AMF SISTEMA-DP</h1>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Gestão de Departamento Pessoal &bull; Base 220h</div>
+        <!-- ABA 1: FUNCIONÁRIOS -->
+        <div id="aba-funcionarios" class="tab-content active">
+            <div class="card">
+                <h2>👥 Cadastro de Funcionários</h2>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Nome Completo</label>
+                        <input type="text" id="cadNome" placeholder="Ex: João da Silva">
+                    </div>
+                    <div class="form-group">
+                        <label>CPF</label>
+                        <input type="text" id="cadCpf" placeholder="000.000.000-00">
+                    </div>
+                    <div class="form-group">
+                        <label>Cargo / Função</label>
+                        <input type="text" id="cadCargo" placeholder="Ex: Analista">
+                    </div>
+                    <div class="form-group">
+                        <label>Salário Base (R$)</label>
+                        <input type="number" id="cadSalario" step="0.01" value="2200.00">
+                    </div>
                 </div>
-                <div class="badge-sistema">Ativo</div>
-            </header>
-
-            <!-- ABAS DE NAVEGAÇÃO -->
-            <div class="tabs">
-                <button class="tab-btn active" onclick="mudarAba('funcionarios', event)">1. Funcionários</button>
-                <button class="tab-btn" onclick="mudarAba('rubricas', event)">2. Rubricas</button>
-                <button class="tab-btn" onclick="mudarAba('lancamentos', event)">3. Lançamentos & Holerite</button>
+                <button class="btn-acao" onclick="adicionarFuncionario()">➕ Cadastrar Funcionário</button>
             </div>
 
-            <!-- ABA 1: FUNCIONÁRIOS -->
-            <div id="aba-funcionarios" class="tab-content active">
-                <div class="card">
-                    <h2>👥 Cadastro de Funcionários</h2>
-                    <div class="form-grid">
-                        <div class="form-group full-width">
-                            <label>Nome Completo</label>
-                            <input type="text" id="cadNome" placeholder="Ex: João da Silva">
-                        </div>
-                        <div class="form-group">
-                            <label>CPF</label>
-                            <input type="text" id="cadCpf" placeholder="000.000.000-00">
-                        </div>
-                        <div class="form-group">
-                            <label>Cargo / Função</label>
-                            <input type="text" id="cadCargo" placeholder="Ex: Analista">
-                        </div>
-                        <div class="form-group">
-                            <label>Salário Base (R$)</label>
-                            <input type="number" id="cadSalario" step="0.01" value="2200.00">
-                        </div>
-                    </div>
-                    <button class="btn-acao" onclick="adicionarFuncionario()">➕ Cadastrar Funcionário</button>
-                </div>
-
-                <div class="card">
-                    <h2>📋 Funcionários Cadastrados</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Nome</th>
-                                <th>CPF</th>
-                                <th>Cargo</th>
-                                <th>Salário Base</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelaFuncionarios"></tbody>
-                    </table>
-                </div>
+            <div class="card">
+                <h2>📋 Funcionários Cadastrados</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Nome</th>
+                            <th>CPF</th>
+                            <th>Cargo</th>
+                            <th>Salário Base</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaFuncionarios"></tbody>
+                </table>
             </div>
+        </div>
 
-            <!-- ABA 2: RUBRICAS -->
-            <div id="aba-rubricas" class="tab-content">
-                <div class="card">
-                    <h2>⚙️ Cadastro de Rubricas</h2>
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Número da Rubrica</label>
-                            <input type="text" id="rubNum" placeholder="Ex: 004">
-                        </div>
-                        <div class="form-group">
-                            <label>Descrição</label>
-                            <input type="text" id="rubDesc" placeholder="Ex: DSR sobre Horas Extras">
-                        </div>
-                        <div class="form-group">
-                            <label>Tipo</label>
-                            <select id="rubTipo">
-                                <option value="Provento">Provento (+)</option>
-                                <option value="Desconto">Desconto (-)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Fórmula / Cálculo Automático</label>
-                            <select id="rubCalculo">
-                                <option value="manual">Valor Fixo em R$</option>
-                                <option value="he60">Hora Extra 60% (Qtd Horas)</option>
-                                <option value="he100">Hora Extra 100% (Qtd Horas)</option>
-                                <option value="dsr">DSR Automático sobre Horas Extras</option>
-                                <option value="faltas">Falta / Atraso (Qtd Horas)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>Incidir INSS</label>
-                            <select id="rubInss"><option value="Sim">Sim</option><option value="Nao">Não</option></select>
-                        </div>
-                        <div class="form-group">
-                            <label>Incidir IRRF</label>
-                            <select id="rubIrrf"><option value="Sim">Sim</option><option value="Nao">Não</option></select>
-                        </div>
+        <!-- ABA 2: RUBRICAS -->
+        <div id="aba-rubricas" class="tab-content">
+            <div class="card">
+                <h2>⚙️ Cadastro de Rubricas</h2>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Número da Rubrica</label>
+                        <input type="text" id="rubNum" placeholder="Ex: 004">
                     </div>
-                    <button class="btn-acao" onclick="adicionarRubrica()">➕ Cadastrar Rubrica</button>
-                </div>
-
-                <div class="card">
-                    <h2>📑 Tabela de Rubricas</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Núm</th>
-                                <th>Descrição</th>
-                                <th>Tipo</th>
-                                <th>Regra de Cálculo</th>
-                                <th>INSS</th>
-                                <th>IRRF</th>
-                                <th>Ação</th>
-                            </tr>
-                        </thead>
-                        <tbody id="tabelaRubricas"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- ABA 3: LANÇAMENTOS E HOLERITE -->
-            <div id="aba-lancamentos" class="tab-content">
-                <div class="card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h2 style="margin: 0;">📊 Lançamento da Folha</h2>
-                        <div style="display: flex; gap: 10px; align-items: center;">
-                            <div class="form-group" style="margin:0;">
-                                <label style="font-size: 0.65rem;">Mês</label>
-                                <select id="lancMes" style="padding: 6px 10px;">
-                                    <option value="Janeiro">Janeiro</option>
-                                    <option value="Fevereiro">Fevereiro</option>
-                                    <option value="Março">Março</option>
-                                    <option value="Abril">Abril</option>
-                                    <option value="Maio">Maio</option>
-                                    <option value="Junho">Junho</option>
-                                    <option value="Julho">Julho</option>
-                                    <option value="Agosto">Agosto</option>
-                                    <option value="Setembro">Setembro</option>
-                                    <option value="Outubro" selected>Outubro</option>
-                                    <option value="Novembro">Novembro</option>
-                                    <option value="Dezembro">Dezembro</option>
-                                </select>
-                            </div>
-                            <div class="form-group" style="margin:0; width: 90px;">
-                                <label style="font-size: 0.65rem;">Ano</label>
-                                <input type="number" id="lancAno" value="2026" style="padding: 6px 10px;">
-                            </div>
-                        </div>
+                    <div class="form-group">
+                        <label>Descrição</label>
+                        <input type="text" id="rubDesc" placeholder="Ex: DSR sobre Horas Extras">
                     </div>
-
-                    <div class="form-group full-width" style="margin-bottom: 16px;">
-                        <label>Selecionar Funcionário</label>
-                        <select id="filtroFuncionario" onchange="carregarFuncionarioSelecionado()">
-                            <option value="">Selecione o funcionário...</option>
+                    <div class="form-group">
+                        <label>Tipo</label>
+                        <select id="rubTipo">
+                            <option value="Provento">Provento (+)</option>
+                            <option value="Desconto">Desconto (-)</option>
                         </select>
                     </div>
-
-                    <div class="form-grid">
-                        <div class="form-group">
-                            <label>Salário Base (R$)</label>
-                            <input type="number" id="lancSalarioBase" step="0.01" oninput="calcularFolha()">
-                        </div>
-                        <div class="form-group">
-                            <label>Dias Úteis do Mês (Para DSR)</label>
-                            <input type="number" id="lancDiasUteis" value="25" oninput="calcularFolha()">
-                        </div>
-                        <div class="form-group">
-                            <label>Domingos e Feriados (Para DSR)</label>
-                            <input type="number" id="lancDomingos" value="5" oninput="calcularFolha()">
-                        </div>
+                    <div class="form-group">
+                        <label>Fórmula / Cálculo Automático</label>
+                        <select id="rubCalculo">
+                            <option value="manual">Valor Fixo em R$</option>
+                            <option value="he60">Hora Extra 60% (Qtd Horas)</option>
+                            <option value="he100">Hora Extra 100% (Qtd Horas)</option>
+                            <option value="dsr">DSR Automático sobre Horas Extras</option>
+                            <option value="faltas">Falta / Atraso (Qtd Horas)</option>
+                        </select>
                     </div>
-
-                    <h3 style="font-size: 0.9rem; margin-top: 20px; color: var(--primary);">Lançamento Dinâmico por Rubrica</h3>
-                    
-                    <div style="display: flex; gap: 10px; margin-bottom: 15px;">
-                        <div class="form-group" style="flex: 1; margin: 0;">
-                            <label>Selecionar Rubrica para Lançar</label>
-                            <select id="selectAdicionarRubrica">
-                                <option value="">Selecione a rubrica...</option>
-                            </select>
-                        </div>
-                        <div style="display: flex; align-items: flex-end;">
-                            <button class="btn-acao" onclick="adicionarRubricaLancamento()" style="margin: 0; padding: 11px 20px;">➕ Adicionar</button>
-                        </div>
+                    <div class="form-group">
+                        <label>Incidir INSS</label>
+                        <select id="rubInss"><option value="Sim">Sim</option><option value="Nao">Não</option></select>
                     </div>
-
-                    <div id="containerLancamentosRubricas"></div>
-
-                    <button class="btn-acao btn-jobs" onclick="salvarNoJobsIn()" style="margin-top: 20px;">☁️ Salvar Dados no JSONBin</button>
+                    <div class="form-group">
+                        <label>Incidir IRRF</label>
+                        <select id="rubIrrf"><option value="Sim">Sim</option><option value="Nao">Não</option></select>
+                    </div>
                 </div>
-
-                <div class="card" id="cardResultado">
-                    <h2>📄 Demonstrativo de Pagamento (Holerite)</h2>
-                    
-                    <div class="info-funcionario">
-                        <div>Funcionário: <strong id="outNome">Selecione acima</strong></div>
-                        <div>Competência: <strong id="outCompetencia">Outubro/2026</strong></div>
-                    </div>
-
-                    <div class="resultado-grid">
-                        <div class="bloco-resumo">
-                            <h3>(+) Proventos (Vencimentos)</h3>
-                            <div class="linha-valor"><span>Salário Base (220h):</span> <span id="resSalarioBase">R$ 0,00</span></div>
-                            <div id="listaResumoProventos"></div>
-                            <div class="linha-valor total"><span>Total de Proventos:</span> <span id="resTotalProventos">R$ 0,00</span></div>
-                        </div>
-
-                        <div class="bloco-resumo">
-                            <h3>(-) Descontos</h3>
-                            <div id="listaResumoDescontos"></div>
-                            <div class="linha-valor"><span>INSS:</span> <span id="resInss">R$ 0,00</span></div>
-                            <div class="linha-valor"><span>IRRF:</span> <span id="resIrrf">R$ 0,00</span></div>
-                            <div class="linha-valor total"><span>Total de Descontos:</span> <span id="resTotalDescontos">R$ 0,00</span></div>
-                        </div>
-                    </div>
-
-                    <div class="liquido-box">
-                        <h3>Valor Líquido a Receber</h3>
-                        <div class="valor-liquido" id="resValorLiquido">R$ 0,00</div>
-                    </div>
-
-                    <button class="btn-acao" style="margin-top: 20px; background-color: #059669;" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
-                </div>
+                <button class="btn-acao" onclick="adicionarRubrica()">➕ Cadastrar Rubrica</button>
             </div>
 
+            <div class="card">
+                <h2>📑 Tabela de Rubricas</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Núm</th>
+                            <th>Descrição</th>
+                            <th>Tipo</th>
+                            <th>Regra de Cálculo</th>
+                            <th>INSS</th>
+                            <th>IRRF</th>
+                            <th>Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaRubricas"></tbody>
+                </table>
+            </div>
         </div>
+
+        <!-- ABA 3: LANÇAMENTOS E HOLERITE -->
+        <div id="aba-lancamentos" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="margin: 0;">📊 Lançamento da Folha</h2>
+                    <div style="display: flex; gap: 10px; align-items: center;">
+                        <div class="form-group" style="margin:0;">
+                            <label style="font-size: 0.65rem;">Mês</label>
+                            <select id="lancMes" style="padding: 6px 10px;">
+                                <option value="Janeiro">Janeiro</option>
+                                <option value="Fevereiro">Fevereiro</option>
+                                <option value="Março">Março</option>
+                                <option value="Abril">Abril</option>
+                                <option value="Maio">Maio</option>
+                                <option value="Junho">Junho</option>
+                                <option value="Julho">Julho</option>
+                                <option value="Agosto">Agosto</option>
+                                <option value="Setembro">Setembro</option>
+                                <option value="Outubro" selected>Outubro</option>
+                                <option value="Novembro">Novembro</option>
+                                <option value="Dezembro">Dezembro</option>
+                            </select>
+                        </div>
+                        <div class="form-group" style="margin:0; width: 90px;">
+                            <label style="font-size: 0.65rem;">Ano</label>
+                            <input type="number" id="lancAno" value="2026" style="padding: 6px 10px;">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group full-width" style="margin-bottom: 16px;">
+                    <label>Selecionar Funcionário</label>
+                    <select id="filtroFuncionario" onchange="carregarFuncionarioSelecionado()">
+                        <option value="">Selecione o funcionário...</option>
+                    </select>
+                </div>
+
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Salário Base (R$)</label>
+                        <input type="number" id="lancSalarioBase" step="0.01" oninput="calcularFolha()">
+                    </div>
+                    <div class="form-group">
+                        <label>Dias Úteis do Mês (Para DSR)</label>
+                        <input type="number" id="lancDiasUteis" value="25" oninput="calcularFolha()">
+                    </div>
+                    <div class="form-group">
+                        <label>Domingos e Feriados (Para DSR)</label>
+                        <input type="number" id="lancDomingos" value="5" oninput="calcularFolha()">
+                    </div>
+                </div>
+
+                <h3 style="font-size: 0.9rem; margin-top: 20px; color: var(--primary);">Lançamento Dinâmico por Rubrica</h3>
+                
+                <div style="display: flex; gap: 10px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1; margin: 0;">
+                        <label>Selecionar Rubrica para Lançar</label>
+                        <select id="selectAdicionarRubrica">
+                            <option value="">Selecione a rubrica...</option>
+                        </select>
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button class="btn-acao" onclick="adicionarRubricaLancamento()" style="margin: 0; padding: 11px 20px;">➕ Adicionar</button>
+                    </div>
+                </div>
+
+                <div id="containerLancamentosRubricas"></div>
+
+                <button class="btn-acao btn-jobs" onclick="salvarNoJobsIn()" style="margin-top: 20px;">☁️ Salvar Dados no JSONBin</button>
+            </div>
+
+            <div class="card" id="cardResultado">
+                <h2>📄 Demonstrativo de Pagamento (Holerite)</h2>
+                
+                <div class="info-funcionario">
+                    <div>Funcionário: <strong id="outNome">Selecione acima</strong></div>
+                    <div>Competência: <strong id="outCompetencia">Outubro/2026</strong></div>
+                </div>
+
+                <div class="resultado-grid">
+                    <div class="bloco-resumo">
+                        <h3>(+) Proventos (Vencimentos)</h3>
+                        <div class="linha-valor"><span>Salário Base (220h):</span> <span id="resSalarioBase">R$ 0,00</span></div>
+                        <div id="listaResumoProventos"></div>
+                        <div class="linha-valor total"><span>Total de Proventos:</span> <span id="resTotalProventos">R$ 0,00</span></div>
+                    </div>
+
+                    <div class="bloco-resumo">
+                        <h3>(-) Descontos</h3>
+                        <div id="listaResumoDescontos"></div>
+                        <div class="linha-valor"><span>INSS:</span> <span id="resInss">R$ 0,00</span></div>
+                        <div class="linha-valor"><span>IRRF:</span> <span id="resIrrf">R$ 0,00</span></div>
+                        <div class="linha-valor total"><span>Total de Descontos:</span> <span id="resTotalDescontos">R$ 0,00</span></div>
+                    </div>
+                </div>
+
+                <div class="liquido-box">
+                    <h3>Valor Líquido a Receber</h3>
+                    <div class="valor-liquido" id="resValorLiquido">R$ 0,00</div>
+                </div>
+
+                <button class="btn-acao" style="margin-top: 20px; background-color: #059669;" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+            </div>
+        </div>
+
     </div>
 
 <script>
@@ -610,39 +513,17 @@
 
     let lancamentosAtivos = {};
 
-    function verificarSenha() {
-        let inputEl = document.getElementById('inputSenha');
-        let senha = inputEl.value.toString().trim();
-        if (senha === "0") {
-            document.getElementById('telaLogin').style.display = 'none';
-            document.getElementById('sistemaPrincipal').style.display = 'block';
-            atualizarTelas();
-            carregarDoJobsIn();
-        } else {
-            document.getElementById('msgErro').style.display = 'block';
-            inputEl.value = '';
-        }
-    }
-
-    function checarEnter(event) {
-        if (event.key === 'Enter') verificarSenha();
-    }
+    // Inicializa o sistema direto ao carregar a página
+    window.onload = function() {
+        atualizarTelas();
+        carregarDoJobsIn();
+    };
 
     function mudarAba(abaId, evt) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
         document.getElementById('aba-' + abaId).classList.add('active');
         if(evt) evt.currentTarget.classList.add('active');
-    }
-
-    function validarSenhaAcao() {
-        let senha = prompt("Digite a senha para autorizar esta ação:");
-        if (senha === "0") {
-            return true;
-        } else if (senha !== null) {
-            alert("Senha incorreta! Ação cancelada.");
-        }
-        return false;
     }
 
     function adicionarFuncionario() {
@@ -663,7 +544,6 @@
     }
 
     function editarFuncionario(index) {
-        if(!validarSenhaAcao()) return;
         let f = funcionarios[index];
         let novoNome = prompt("Editar Nome:", f.nome);
         if(novoNome === null) return;
@@ -686,7 +566,6 @@
     }
 
     function excluirFuncionario(index) {
-        if(!validarSenhaAcao()) return;
         funcionarios.splice(index, 1);
         localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
         atualizarTelas();
@@ -708,3 +587,342 @@
         alert("Rubrica cadastrada com sucesso!");
         document.getElementById('rubNum').value = '';
         document.getElementById('rubDesc').value = '';
+    }
+
+    function editarRubrica(index) {
+        let r = rubricas[index];
+        let novaDesc = prompt("Editar Descrição:", r.desc);
+        if(novaDesc === null) return;
+
+        rubricas[index].desc = novaDesc || r.desc;
+        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+        atualizarTelas();
+        alert("Rubrica atualizada com sucesso!");
+    }
+
+    function excluirRubrica(index) {
+        rubricas.splice(index, 1);
+        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+        atualizarTelas();
+    }
+
+    function atualizarTelas() {
+        let tbFunc = document.getElementById('tabelaFuncionarios');
+        tbFunc.innerHTML = '';
+        let selectFiltro = document.getElementById('filtroFuncionario');
+        selectFiltro.innerHTML = '<option value="">Selecione o funcionário...</option>';
+
+        funcionarios.forEach((f, index) => {
+            tbFunc.innerHTML += `<tr>
+                <td>${f.nome}</td>
+                <td>${f.cpf || '-'}</td>
+                <td>${f.cargo}</td>
+                <td>R$ ${f.salario.toFixed(2)}</td>
+                <td>
+                    <button onclick="editarFuncionario(${index})" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-right:4px;">Editar</button>
+                    <button onclick="excluirFuncionario(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button>
+                </td>
+            </tr>`;
+            selectFiltro.innerHTML += `<option value="${index}">${f.nome} - ${f.cargo}</option>`;
+        });
+
+        let tbRub = document.getElementById('tabelaRubricas');
+        tbRub.innerHTML = '';
+        rubricas.forEach((r, index) => {
+            let nomeCalculo = "Valor Fixo (R$)";
+            if(r.calculo === "he60") nomeCalculo = "Hora Extra 60% (Qtd Horas)";
+            if(r.calculo === "he100") nomeCalculo = "Hora Extra 100% (Qtd Horas)";
+            if(r.calculo === "dsr") nomeCalculo = "DSR Automático sobre Horas Extras";
+            if(r.calculo === "faltas") nomeCalculo = "Faltas / Atrasos (Qtd Horas)";
+
+            tbRub.innerHTML += `<tr>
+                <td>${r.num}</td>
+                <td>${r.desc}</td>
+                <td>${r.tipo}</td>
+                <td>${nomeCalculo}</td>
+                <td>${r.inss}</td>
+                <td>${r.irrf}</td>
+                <td>
+                    <button onclick="editarRubrica(${index})" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-right:4px;">Editar</button>
+                    <button onclick="excluirRubrica(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button>
+                </td>
+            </tr>`;
+        });
+
+        atualizarSelectFiltroRubricas();
+        montarCamposLancamento();
+    }
+
+    function atualizarSelectFiltroRubricas() {
+        let selectRub = document.getElementById('selectAdicionarRubrica');
+        selectRub.innerHTML = '<option value="">Selecione a rubrica...</option>';
+        rubricas.forEach((r, index) => {
+            if(r.num === "001") return; // Ignora o salário base
+            selectRub.innerHTML += `<option value="${index}">${r.num} - ${r.desc} (${r.tipo})</option>`;
+        });
+    }
+
+    function adicionarRubricaLancamento() {
+        let selectRub = document.getElementById('selectAdicionarRubrica');
+        let indexRub = selectRub.value;
+        if(indexRub === "") { alert("Selecione uma rubrica para adicionar!"); return; }
+
+        if(lancamentosAtivos[indexRub] === undefined) {
+            lancamentosAtivos[indexRub] = 0;
+        }
+        montarCamposLancamento();
+        calcularFolha();
+    }
+
+    function removerRubricaLancamento(indexRub) {
+        delete lancamentosAtivos[indexRub];
+        montarCamposLancamento();
+        calcularFolha();
+    }
+
+    function montarCamposLancamento() {
+        let container = document.getElementById('containerLancamentosRubricas');
+        container.innerHTML = '';
+
+        let chaves = Object.keys(lancamentosAtivos);
+        if(chaves.length === 0) {
+            container.innerHTML = `<div style="font-size: 0.85rem; color: var(--text-muted); font-style: italic; padding: 10px 0;">Nenhuma rubrica adicional lançada. Selecione acima e clique em Adicionar.</div>`;
+            return;
+        }
+
+        chaves.forEach(indexRub => {
+            let r = rubricas[indexRub];
+            if(!r) return;
+
+            if(r.calculo === "dsr") {
+                container.innerHTML += `
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px; background: #f0fdf4; padding: 10px; border-radius: 8px; border: 1px solid #bbf7d0;">
+                        <div style="flex: 1;">
+                            <label style="color: #047857; margin:0; font-size: 0.8rem;"><strong>${r.desc}</strong> (DSR Automático)</label>
+                            <input type="text" value="Calculado Automaticamente" disabled style="background: #e6f4ea; color: #065f46; font-weight: 600; margin-top: 4px;">
+                        </div>
+                        <button onclick="removerRubricaLancamento(${indexRub})" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; height: 38px; margin-top: 14px;">🗑️</button>
+                    </div>
+                `;
+                return;
+            }
+
+            let rotulo = `Valor (R$) para ${r.desc} (${r.tipo})`;
+            if(r.calculo === "he60" || r.calculo === "he100" || r.calculo === "faltas") {
+                rotulo = `Qtd de Horas para: ${r.desc}`;
+            }
+
+            container.innerHTML += `
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px;">
+                    <div class="form-group" style="flex: 1; margin: 0;">
+                        <label>${rotulo}</label>
+                        <input type="number" id="lanc_rub_${indexRub}" step="0.5" value="${lancamentosAtivos[indexRub]}" data-calculo="${r.calculo}" data-tipo="${r.tipo}" oninput="atualizarValorLancamento(${indexRub})">
+                    </div>
+                    <button onclick="removerRubricaLancamento(${indexRub})" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; height: 38px; margin-top: 14px;" title="Remover rubrica">🗑️</button>
+                </div>
+            `;
+        });
+    }
+
+    function atualizarValorLancamento(indexRub) {
+        let inputEl = document.getElementById(`lanc_rub_${indexRub}`);
+        if(inputEl) {
+            lancamentosAtivos[indexRub] = parseFloat(inputEl.value) || 0;
+        }
+        calcularFolha();
+    }
+
+    function carregarFuncionarioSelecionado() {
+        let index = document.getElementById('filtroFuncionario').value;
+        if(index === "") return;
+        let f = funcionarios[index];
+        document.getElementById('lancSalarioBase').value = f.salario;
+        calcularFolha();
+    }
+
+    function formatarMoeda(valor) {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function calcularINSS(salarioBruto) {
+        let inss = 0;
+        if (salarioBruto <= 1412.00) {
+            inss = salarioBruto * 0.075;
+        } else if (salarioBruto <= 2666.68) {
+            inss = (1412.00 * 0.075) + ((salarioBruto - 1412.00) * 0.09);
+        } else if (salarioBruto <= 4000.03) {
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((salarioBruto - 2666.68) * 0.12);
+        } else if (salarioBruto <= 7786.02) {
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((4000.03 - 2666.68) * 0.12) + ((salarioBruto - 4000.03) * 0.14);
+        } else {
+            inss = 908.86;
+        }
+        return inss;
+    }
+
+    function calcularIRRF(baseCalculo) {
+        let irrf = 0;
+        if (baseCalculo <= 2259.20) {
+            irrf = 0;
+        } else if (baseCalculo <= 2826.65) {
+            irrf = (baseCalculo * 0.075) - 169.44;
+        } else if (baseCalculo <= 3751.05) {
+            irrf = (baseCalculo * 0.15) - 381.44;
+        } else if (baseCalculo <= 4664.68) {
+            irrf = (baseCalculo * 0.225) - 662.77;
+        } else {
+            irrf = (baseCalculo * 0.275) - 896.00;
+        }
+        return irrf < 0 ? 0 : irrf;
+    }
+
+    function calcularFolha() {
+        let index = document.getElementById('filtroFuncionario').value;
+        let nome = "Colaborador Exemplo";
+        let cargo = "Assistente";
+
+        if(index !== "" && funcionarios[index]) {
+            nome = funcionarios[index].nome;
+            cargo = funcionarios[index].cargo;
+        }
+
+        let salarioBase = parseFloat(document.getElementById('lancSalarioBase').value) || 0;
+        let diasUteis = parseFloat(document.getElementById('lancDiasUteis').value) || 25;
+        let domingos = parseFloat(document.getElementById('lancDomingos').value) || 5;
+        let mes = document.getElementById('lancMes').value;
+        let ano = document.getElementById('lancAno').value;
+
+        let valorHora = salarioBase / 220;
+
+        let totalProventos = salarioBase;
+        let totalDescontos = 0;
+        let baseInss = salarioBase;
+
+        let valorTotalHorasExtras = 0;
+
+        // 1ª Passada: Calcula o valor total das horas extras para base do DSR
+        Object.keys(lancamentosAtivos).forEach(indexRub => {
+            let r = rubricas[indexRub];
+            if(r && (r.calculo === "he60" || r.calculo === "he100")) {
+                let qtdHoras = lancamentosAtivos[indexRub] || 0;
+                if(r.calculo === "he60") {
+                    valorTotalHorasExtras += qtdHoras * (valorHora * 1.6);
+                } else if(r.calculo === "he100") {
+                    valorTotalHorasExtras += qtdHoras * (valorHora * 2.0);
+                }
+            }
+        });
+
+        let htmlProventos = "";
+        let htmlDescontos = "";
+
+        // 2ª Passada: Calcula todas as rubricas ativas
+        Object.keys(lancamentosAtivos).forEach(indexRub => {
+            let r = rubricas[indexRub];
+            if(!r) return;
+
+            let valorCalculado = 0;
+
+            if(r.calculo === "dsr") {
+                valorCalculado = (valorTotalHorasExtras / diasUteis) * domingos;
+            } else {
+                let valorDigitado = lancamentosAtivos[indexRub] || 0;
+                if(r.calculo === "he60") {
+                    valorCalculado = valorDigitado * (valorHora * 1.6);
+                } else if(r.calculo === "he100") {
+                    valorCalculado = valorDigitado * (valorHora * 2.0);
+                } else if(r.calculo === "faltas") {
+                    valorCalculado = valorDigitado * valorHora;
+                } else {
+                    valorCalculado = valorDigitado;
+                }
+            }
+
+            if(valorCalculado > 0) {
+                if(r.tipo === "Provento") {
+                    totalProventos += valorCalculado;
+                    if(r.inss === "Sim") baseInss += valorCalculado;
+                    htmlProventos += `<div class="linha-valor"><span>${r.desc}:</span> <span>${formatarMoeda(valorCalculado)}</span></div>`;
+                } else {
+                    totalDescontos += valorCalculado;
+                    if(r.inss === "Sim") baseInss -= valorCalculado;
+                    htmlDescontos += `<div class="linha-valor"><span>${r.desc}:</span> <span>${formatarMoeda(valorCalculado)}</span></div>`;
+                }
+            }
+        });
+
+        let valorInss = calcularINSS(baseInss);
+        let baseIrrf = baseInss - valorInss;
+        let valorIrrf = calcularIRRF(baseIrrf);
+
+        totalDescontos += valorInss + valorIrrf;
+        let valorLiquido = totalProventos - totalDescontos;
+
+        document.getElementById('outNome').textContent = nome;
+        document.getElementById('outCompetencia').textContent = `${mes}/${ano}`;
+
+        document.getElementById('resSalarioBase').textContent = formatarMoeda(salarioBase);
+        document.getElementById('listaResumoProventos').innerHTML = htmlProventos;
+        document.getElementById('resTotalProventos').textContent = formatarMoeda(totalProventos);
+
+        document.getElementById('listaResumoDescontos').innerHTML = htmlDescontos;
+        document.getElementById('resInss').textContent = formatarMoeda(valorInss);
+        document.getElementById('resIrrf').textContent = formatarMoeda(valorIrrf);
+        document.getElementById('resTotalDescontos').textContent = formatarMoeda(totalDescontos);
+
+        document.getElementById('resValorLiquido').textContent = formatarMoeda(valorLiquido);
+    }
+
+    function salvarNoJobsIn() {
+        if(!BIN_ID) {
+            let bin = prompt("Digite o ID do seu Bin do JSONBin:");
+            if(!bin) return;
+            window.BIN_ID_DADO = bin;
+        } else {
+            window.BIN_ID_DADO = BIN_ID;
+        }
+
+        let dadosGerais = { funcionarios, rubricas };
+
+        fetch(`https://api.jsonbin.io/v3/b/${window.BIN_ID_DADO}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': API_KEY || prompt("Digite sua X-Master-Key do JSONBin:")
+            },
+            body: JSON.stringify(dadosGerais)
+        })
+        .then(response => response.json())
+        .then(result => {
+            alert("Dados e cadastros salvos com sucesso no JSONBin!");
+        })
+        .catch(error => {
+            alert("Erro ao salvar: " + error);
+        });
+    }
+
+    function carregarDoJobsIn() {
+        if(!BIN_ID) return;
+        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+            headers: { 'X-Master-Key': API_KEY }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data && data.record) {
+                if(data.record.funcionarios) {
+                    funcionarios = data.record.funcionarios;
+                    localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
+                }
+                if(data.record.rubricas) {
+                    rubricas = data.record.rubricas;
+                    localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+                }
+                atualizarTelas();
+            }
+        })
+        .catch(err => console.log("Erro ao carregar do JSONBin"));
+    }
+</script>
+
+</body>
+</html>
