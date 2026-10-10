@@ -353,7 +353,7 @@
 </head>
 <body>
 
-    <!-- TELA DE LOGIN -->
+    <!-- TELA DE LOGIN FIXA COM SENHA 0 -->
     <div id="telaLogin">
         <div class="login-card">
             <h2>AMF SISTEMA-DP</h2>
@@ -503,9 +503,7 @@
                     </div>
 
                     <h3 style="font-size: 0.9rem; margin-top: 20px; color: var(--primary);">Lançamento Dinâmico por Rubrica</h3>
-                    <div id="containerLancamentosRubricas">
-                        <!-- Gerado dinamicamente com base nas rubricas cadastradas -->
-                    </div>
+                    <div id="containerLancamentosRubricas"></div>
 
                     <button class="btn-acao btn-jobs" onclick="salvarNoJobsIn()" style="margin-top: 20px;">☁️ Salvar Dados no JSONBin</button>
                 </div>
@@ -563,7 +561,7 @@
 
     function verificarSenha() {
         let senha = document.getElementById('inputSenha').value.toString().trim();
-        if (senha === "0" || senha === "") {
+        if (senha === "0") {
             document.getElementById('telaLogin').style.display = 'none';
             document.getElementById('sistemaPrincipal').style.display = 'block';
             atualizarTelas();
@@ -676,7 +674,7 @@
         container.innerHTML = '';
 
         rubricas.forEach((r, index) => {
-            if(r.num === "001") return; // Ignora o salário base fixo que já tem campo próprio
+            if(r.num === "001") return;
 
             let rotulo = `Valor (R$) para ${r.desc} (${r.tipo})`;
             if(r.calculo === "he50" || r.calculo === "he100" || r.calculo === "faltas") {
@@ -713,4 +711,152 @@
         } else if (salarioBruto <= 4000.03) {
             inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((salarioBruto - 2666.68) * 0.12);
         } else if (salarioBruto <= 7786.02) {
-            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((4000.03 -
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((4000.03 - 2666.68) * 0.12) + ((salarioBruto - 4000.03) * 0.14);
+        } else {
+            inss = 908.86;
+        }
+        return inss;
+    }
+
+    function calcularIRRF(baseCalculo) {
+        let irrf = 0;
+        if (baseCalculo <= 2259.20) {
+            irrf = 0;
+        } else if (baseCalculo <= 2826.65) {
+            irrf = (baseCalculo * 0.075) - 169.44;
+        } else if (baseCalculo <= 3751.05) {
+            irrf = (baseCalculo * 0.15) - 381.44;
+        } else if (baseCalculo <= 4664.68) {
+            irrf = (baseCalculo * 0.225) - 662.77;
+        } else {
+            irrf = (baseCalculo * 0.275) - 896.00;
+        }
+        return irrf < 0 ? 0 : irrf;
+    }
+
+    function calcularFolha() {
+        let index = document.getElementById('filtroFuncionario').value;
+        let nome = "Colaborador Exemplo";
+        let cargo = "Assistente";
+
+        if(index !== "" && funcionarios[index]) {
+            nome = funcionarios[index].nome;
+            cargo = funcionarios[index].cargo;
+        }
+
+        let salarioBase = parseFloat(document.getElementById('lancSalarioBase').value) || 0;
+        let valorHora = salarioBase / 220;
+
+        let totalProventos = salarioBase;
+        let totalDescontos = 0;
+        let baseInss = salarioBase;
+
+        let htmlProventos = "";
+        let htmlDescontos = "";
+
+        rubricas.forEach((r, index) => {
+            if(r.num === "001") return;
+            let inputEl = document.getElementById(`lanc_rub_${index}`);
+            if(!inputEl) return;
+
+            let valorDigitado = parseFloat(inputEl.value) || 0;
+            let valorCalculado = 0;
+
+            if(r.calculo === "he50") {
+                valorCalculado = valorDigitado * (valorHora * 1.5);
+            } else if(r.calculo === "he100") {
+                valorCalculado = valorDigitado * (valorHora * 2.0);
+            } else if(r.calculo === "faltas") {
+                valorCalculado = valorDigitado * valorHora;
+            } else {
+                valorCalculado = valorDigitado;
+            }
+
+            if(valorCalculado > 0) {
+                if(r.tipo === "Provento") {
+                    totalProventos += valorCalculado;
+                    if(r.inss === "Sim") baseInss += valorCalculado;
+                    htmlProventos += `<div class="linha-valor"><span>${r.desc}:</span> <span>${formatarMoeda(valorCalculado)}</span></div>`;
+                } else {
+                    totalDescontos += valorCalculado;
+                    if(r.inss === "Sim") baseInss -= valorCalculado;
+                    htmlDescontos += `<div class="linha-valor"><span>${r.desc}:</span> <span>${formatarMoeda(valorCalculado)}</span></div>`;
+                }
+            }
+        });
+
+        let valorInss = calcularINSS(baseInss);
+        let baseIrrf = baseInss - valorInss;
+        let valorIrrf = calcularIRRF(baseIrrf);
+
+        totalDescontos += valorInss + valorIrrf;
+        let valorLiquido = totalProventos - totalDescontos;
+
+        document.getElementById('outNome').textContent = nome;
+        document.getElementById('outCargo').textContent = cargo;
+
+        document.getElementById('resSalarioBase').textContent = formatarMoeda(salarioBase);
+        document.getElementById('listaResumoProventos').innerHTML = htmlProventos;
+        document.getElementById('resTotalProventos').textContent = formatarMoeda(totalProventos);
+
+        document.getElementById('listaResumoDescontos').innerHTML = htmlDescontos;
+        document.getElementById('resInss').textContent = formatarMoeda(valorInss);
+        document.getElementById('resIrrf').textContent = formatarMoeda(valorIrrf);
+        document.getElementById('resTotalDescontos').textContent = formatarMoeda(totalDescontos);
+
+        document.getElementById('resValorLiquido').textContent = formatarMoeda(valorLiquido);
+    }
+
+    function salvarNoJobsIn() {
+        if(!BIN_ID) {
+            let bin = prompt("Digite o ID do seu Bin do JSONBin:");
+            if(!bin) return;
+            window.BIN_ID_DADO = bin;
+        } else {
+            window.BIN_ID_DADO = BIN_ID;
+        }
+
+        let dadosGerais = { funcionarios, rubricas };
+
+        fetch(`https://api.jsonbin.io/v3/b/${window.BIN_ID_DADO}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': API_KEY || prompt("Digite sua X-Master-Key do JSONBin:")
+            },
+            body: JSON.stringify(dadosGerais)
+        })
+        .then(response => response.json())
+        .then(result => {
+            alert("Dados e cadastros salvos com sucesso no JSONBin!");
+        })
+        .catch(error => {
+            alert("Erro ao salvar: " + error);
+        });
+    }
+
+    function carregarDoJobsIn() {
+        if(!BIN_ID) return;
+        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+            headers: { 'X-Master-Key': API_KEY }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data && data.record) {
+                if(data.record.funcionarios) {
+                    funcionarios = data.record.funcionarios;
+                    localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
+                }
+                if(data.record.rubricas) {
+                    rubricas = data.record.rubricas;
+                    localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+                }
+                atualizarTelas();
+            }
+        })
+        .catch(err => console.log("Erro ao carregar do JSONBin"));
+    }
+</script>
+
+</body>
+</html>
