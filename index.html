@@ -353,12 +353,12 @@
 </head>
 <body>
 
-    <!-- TELA DE LOGIN -->
+    <!-- TELA DE LOGIN CORRIGIDA -->
     <div id="telaLogin">
         <div class="login-card">
             <h2>AMF SISTEMA-DP</h2>
             <p>Sistema de Departamento Pessoal</p>
-            <input type="password" id="inputSenha" placeholder="Digite sua senha" onkeypress="checarEnter(event)" autofocus>
+            <input type="text" id="inputSenha" placeholder="Digite sua senha" onkeypress="checarEnter(event)" autofocus>
             <button onclick="verificarSenha()">Entrar no Sistema</button>
             <div id="msgErro" class="erro-senha">Senha incorreta! Tente novamente.</div>
         </div>
@@ -377,9 +377,9 @@
 
             <!-- ABAS DE NAVEGAÇÃO -->
             <div class="tabs">
-                <button class="tab-btn active" onclick="mudarAba('funcionarios')">1. Funcionários</button>
-                <button class="tab-btn" onclick="mudarAba('rubricas')">2. Rubricas</button>
-                <button class="tab-btn" onclick="mudarAba('lancamentos')">3. Lançamentos & Holerite</button>
+                <button class="tab-btn active" onclick="mudarAba('funcionarios', event)">1. Funcionários</button>
+                <button class="tab-btn" onclick="mudarAba('rubricas', event)">2. Rubricas</button>
+                <button class="tab-btn" onclick="mudarAba('lancamentos', event)">3. Lançamentos & Holerite</button>
             </div>
 
             <!-- ABA 1: FUNCIONÁRIOS -->
@@ -573,7 +573,7 @@
 
     function verificarSenha() {
         let senha = document.getElementById('inputSenha').value.trim();
-        if (senha === "0") {
+        if (senha === "0" || senha === 0) {
             document.getElementById('telaLogin').style.display = 'none';
             document.getElementById('sistemaPrincipal').style.display = 'block';
             atualizarTelas();
@@ -588,11 +588,11 @@
         if (event.key === 'Enter') verificarSenha();
     }
 
-    function mudarAba(abaId) {
+    function mudarAba(abaId, evt) {
         document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
         document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
         document.getElementById('aba-' + abaId).classList.add('active');
-        event.currentTarget.classList.add('active');
+        if(evt) evt.currentTarget.classList.add('active');
     }
 
     function adicionarFuncionario() {
@@ -603,100 +603,4 @@
 
         if(!nome) { alert("Informe o nome do funcionário!"); return; }
 
-        funcionarios.push({ nome, cpf, cargo, salario });
-        localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
-        atualizarTelas();
-        alert("Funcionário cadastrado com sucesso!");
-        document.getElementById('cadNome').value = '';
-        document.getElementById('cadCpf').value = '';
-        document.getElementById('cadCargo').value = '';
-    }
-
-    function excluirFuncionario(index) {
-        funcionarios.splice(index, 1);
-        localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
-        atualizarTelas();
-    }
-
-    function adicionarRubrica() {
-        let num = document.getElementById('rubNum').value;
-        let desc = document.getElementById('rubDesc').value;
-        let tipo = document.getElementById('rubTipo').value;
-        let inss = document.getElementById('rubInss').value;
-        let irrf = document.getElementById('rubIrrf').value;
-        let ferias = document.getElementById('rubFerias').value;
-        let c13 = document.getElementById('rub13').value;
-
-        if(!num || !desc) { alert("Preencha o número e a descrição da rubrica!"); return; }
-
-        rubricas.push({ num, desc, tipo, inss, irrf, ferias, c13 });
-        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
-        atualizarTelas();
-        alert("Rubrica cadastrada com sucesso!");
-        document.getElementById('rubNum').value = '';
-        document.getElementById('rubDesc').value = '';
-    }
-
-    function excluirRubrica(index) {
-        rubricas.splice(index, 1);
-        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
-        atualizarTelas();
-    }
-
-    function atualizarTelas() {
-        // Tabela Funcionários
-        let tbFunc = document.getElementById('tabelaFuncionarios');
-        tbFunc.innerHTML = '';
-        let selectFiltro = document.getElementById('filtroFuncionario');
-        selectFiltro.innerHTML = '<option value="">Selecione o funcionário...</option>';
-
-        funcionarios.forEach((f, index) => {
-            tbFunc.innerHTML += `<tr>
-                <td>${f.nome}</td>
-                <td>${f.cpf || '-'}</td>
-                <td>${f.cargo}</td>
-                <td>R$ ${f.salario.toFixed(2)}</td>
-                <td><button onclick="excluirFuncionario(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button></td>
-            </tr>`;
-            selectFiltro.innerHTML += `<option value="${index}">${f.nome} - ${f.cargo}</option>`;
-        });
-
-        // Tabela Rubricas
-        let tbRub = document.getElementById('tabelaRubricas');
-        tbRub.innerHTML = '';
-        rubricas.forEach((r, index) => {
-            tbRub.innerHTML += `<tr>
-                <td>${r.num}</td>
-                <td>${r.desc}</td>
-                <td>${r.tipo}</td>
-                <td>${r.inss}</td>
-                <td>${r.irrf}</td>
-                <td>${r.ferias}</td>
-                <td>${r.c13}</td>
-                <td><button onclick="excluirRubrica(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button></td>
-            </tr>`;
-        });
-    }
-
-    function carregarFuncionarioSelecionado() {
-        let index = document.getElementById('filtroFuncionario').value;
-        if(index === "") return;
-        let f = funcionarios[index];
-        document.getElementById('lancSalarioBase').value = f.salario;
-        calcularFolha();
-    }
-
-    function formatarMoeda(valor) {
-        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-    }
-
-    function calcularINSS(salarioBruto) {
-        let inss = 0;
-        if (salarioBruto <= 1412.00) {
-            inss = salarioBruto * 0.075;
-        } else if (salarioBruto <= 2666.68) {
-            inss = (1412.00 * 0.075) + ((salarioBruto - 1412.00) * 0.09);
-        } else if (salarioBruto <= 4000.03) {
-            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((salarioBruto - 2666.68) * 0.12);
-        } else if (salarioBruto <= 7786.02) {
-            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((4000.0
+        funcionarios.push({ nome
