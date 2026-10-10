@@ -431,11 +431,11 @@
                     <div class="form-grid">
                         <div class="form-group">
                             <label>Número da Rubrica</label>
-                            <input type="text" id="rubNum" placeholder="Ex: 003">
+                            <input type="text" id="rubNum" placeholder="Ex: 004">
                         </div>
                         <div class="form-group">
                             <label>Descrição</label>
-                            <input type="text" id="rubDesc" placeholder="Ex: Horas Extras 60%">
+                            <input type="text" id="rubDesc" placeholder="Ex: DSR sobre Horas Extras">
                         </div>
                         <div class="form-group">
                             <label>Tipo</label>
@@ -450,6 +450,7 @@
                                 <option value="manual">Valor Fixo em R$</option>
                                 <option value="he60">Hora Extra 60% (Qtd Horas)</option>
                                 <option value="he100">Hora Extra 100% (Qtd Horas)</option>
+                                <option value="dsr">DSR Automático sobre Horas Extras</option>
                                 <option value="faltas">Falta / Atraso (Qtd Horas)</option>
                             </select>
                         </div>
@@ -499,6 +500,14 @@
                         <div class="form-group">
                             <label>Salário Base (R$)</label>
                             <input type="number" id="lancSalarioBase" step="0.01" oninput="calcularFolha()">
+                        </div>
+                        <div class="form-group">
+                            <label>Dias Úteis do Mês (Para DSR)</label>
+                            <input type="number" id="lancDiasUteis" value="25" oninput="calcularFolha()">
+                        </div>
+                        <div class="form-group">
+                            <label>Domingos e Feriados (Para DSR)</label>
+                            <input type="number" id="lancDomingos" value="5" oninput="calcularFolha()">
                         </div>
                     </div>
 
@@ -556,7 +565,8 @@
     let rubricas = JSON.parse(localStorage.getItem('amf_rubricas')) || [
         { num: "001", desc: "Salário Base", tipo: "Provento", calculo: "manual", inss: "Sim", irrf: "Sim" },
         { num: "002", desc: "Horas Extras 60%", tipo: "Provento", calculo: "he60", inss: "Sim", irrf: "Sim" },
-        { num: "003", desc: "Faltas / Atrasos", tipo: "Desconto", calculo: "faltas", inss: "Nao", irrf: "Nao" }
+        { num: "003", desc: "DSR sobre Horas Extras", tipo: "Provento", calculo: "dsr", inss: "Sim", irrf: "Sim" },
+        { num: "004", desc: "Faltas / Atrasos", tipo: "Desconto", calculo: "faltas", inss: "Nao", irrf: "Nao" }
     ];
 
     function verificarSenha() {
@@ -703,6 +713,7 @@
             let nomeCalculo = "Valor Fixo (R$)";
             if(r.calculo === "he60") nomeCalculo = "Hora Extra 60% (Qtd Horas)";
             if(r.calculo === "he100") nomeCalculo = "Hora Extra 100% (Qtd Horas)";
+            if(r.calculo === "dsr") nomeCalculo = "DSR Automático sobre Horas Extras";
             if(r.calculo === "faltas") nomeCalculo = "Faltas / Atrasos (Qtd Horas)";
 
             tbRub.innerHTML += `<tr>
@@ -728,6 +739,16 @@
 
         rubricas.forEach((r, index) => {
             if(r.num === "001") return;
+
+            if(r.calculo === "dsr") {
+                container.innerHTML += `
+                    <div class="form-group" style="margin-bottom: 12px; background: #f0fdf4; padding: 10px; border-radius: 8px; border: 1px solid #bbf7d0;">
+                        <label style="color: #047857;"><strong>${r.desc}</strong> (Calculado Automaticamente sobre as Horas Extras)</label>
+                        <input type="text" value="Calculado Automaticamente" disabled style="background: #e6f4ea; color: #065f46; font-weight: 600;">
+                    </div>
+                `;
+                return;
+            }
 
             let rotulo = `Valor (R$) para ${r.desc} (${r.tipo})`;
             if(r.calculo === "he60" || r.calculo === "he100" || r.calculo === "faltas") {
@@ -798,31 +819,56 @@
         }
 
         let salarioBase = parseFloat(document.getElementById('lancSalarioBase').value) || 0;
+        let diasUteis = parseFloat(document.getElementById('lancDiasUteis').value) || 25;
+        let domingos = parseFloat(document.getElementById('lancDomingos').value) || 5;
         let valorHora = salarioBase / 220;
 
         let totalProventos = salarioBase;
         let totalDescontos = 0;
         let baseInss = salarioBase;
 
+        let valorTotalHorasExtras = 0;
+
+        // 1ª Passada: Calcula o valor total das horas extras para base do DSR
+        rubricas.forEach((r, index) => {
+            if(r.calculo === "he60" || r.calculo === "he100") {
+                let inputEl = document.getElementById(`lanc_rub_${index}`);
+                if(inputEl) {
+                    let qtdHoras = parseFloat(inputEl.value) || 0;
+                    if(r.calculo === "he60") {
+                        valorTotalHorasExtras += qtdHoras * (valorHora * 1.6);
+                    } else if(r.calculo === "he100") {
+                        valorTotalHorasExtras += qtdHoras * (valorHora * 2.0);
+                    }
+                }
+            }
+        });
+
         let htmlProventos = "";
         let htmlDescontos = "";
 
+        // 2ª Passada: Calcula todas as rubricas incluindo o DSR automático
         rubricas.forEach((r, index) => {
             if(r.num === "001") return;
-            let inputEl = document.getElementById(`lanc_rub_${index}`);
-            if(!inputEl) return;
-
-            let valorDigitado = parseFloat(inputEl.value) || 0;
+            
             let valorCalculado = 0;
 
-            if(r.calculo === "he60") {
-                valorCalculado = valorDigitado * (valorHora * 1.6);
-            } else if(r.calculo === "he100") {
-                valorCalculado = valorDigitado * (valorHora * 2.0);
-            } else if(r.calculo === "faltas") {
-                valorCalculado = valorDigitado * valorHora;
+            if(r.calculo === "dsr") {
+                valorCalculado = (valorTotalHorasExtras / diasUteis) * domingos;
             } else {
-                valorCalculado = valorDigitado;
+                let inputEl = document.getElementById(`lanc_rub_${index}`);
+                if(!inputEl) return;
+                let valorDigitado = parseFloat(inputEl.value) || 0;
+
+                if(r.calculo === "he60") {
+                    valorCalculado = valorDigitado * (valorHora * 1.6);
+                } else if(r.calculo === "he100") {
+                    valorCalculado = valorDigitado * (valorHora * 2.0);
+                } else if(r.calculo === "faltas") {
+                    valorCalculado = valorDigitado * valorHora;
+                } else {
+                    valorCalculado = valorDigitado;
+                }
             }
 
             if(valorCalculado > 0) {
