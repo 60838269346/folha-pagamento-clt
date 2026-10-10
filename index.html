@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Folha de Pagamento - CLT (220h)</title>
+    <style>
+        :root {
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #475569;
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --success: #10b981;
+            --danger: #ef4444;
+            --border: #cbd5e1;
+            --radius: 8px;
+            --shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            margin: 0;
+            padding: 16px;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: var(--text-main);
+        }
+        .card {
+            background: var(--card-bg);
+            border: 1px solid #e2e8f0;
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+        h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-top: 0;
+            margin-bottom: 16px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+        .form-group label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            color: var(--text-muted);
+        }
+        .form-group input {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            font-size: 0.9rem;
+            background-color: #f8fafc;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #fff;
+        }
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+        .resultado-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        @media(max-width: 600px) {
+            .resultado-grid { grid-template-columns: 1fr; }
+        }
+        .bloco-resumo {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 14px;
+        }
+        .bloco-resumo h3 {
+            font-size: 0.9rem;
+            margin-top: 0;
+            color: var(--text-muted);
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 4px;
+        }
+        .linha-valor {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        .linha-valor.total {
+            font-weight: bold;
+            font-size: 1rem;
+            border-top: 1px dashed #cbd5e1;
+            padding-top: 8px;
+            margin-top: 8px;
+        }
+        .liquido-box {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            padding: 16px;
+            border-radius: 6px;
+            text-align: center;
+            margin-top: 16px;
+        }
+        .liquido-box h3 {
+            margin: 0;
+            font-size: 0.85rem;
+            color: #065f46;
+            text-transform: uppercase;
+        }
+        .liquido-box .valor-liquido {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #047857;
+            margin-top: 4px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Simulador de Folha de Pagamento CLT (220h)</h1>
+
+    <div class="card">
+        <h2>Dados do Funcionário e Lançamentos do Mês</h2>
+        <div class="form-grid">
+            <div class="form-group">
+                <label for="salarioBase">Salário Base (R$)</label>
+                <input type="number" id="salarioBase" value="2200.00" step="0.01">
+            </div>
+            <div class="form-group">
+                <label for="horasExtras">Horas Extras 50% (Qtd Horas)</label>
+                <input type="number" id="horasExtras" value="10" step="0.5">
+            </div>
+            <div class="form-group">
+                <label for="faltasAtrasos">Faltas / Atrasos (Qtd Horas)</label>
+                <input type="number" id="faltasAtrasos" value="0" step="0.5">
+            </div>
+            <div class="form-group">
+                <label for="outrosProventos">Outros Proventos / Bônus (R$)</label>
+                <input type="number" id="outrosProventos" value="0.00" step="0.01">
+            </div>
+        </div>
+        <button onclick="calcularFolha()">Calcular Holerite</button>
+    </div>
+
+    <div class="card" id="cardResultado">
+        <h2>Demonstrativo de Pagamento (Holerite)</h2>
+        
+        <div class="resultado-grid">
+            <!-- Proventos -->
+            <div class="bloco-resumo">
+                <h3>(+) Proventos (Vencimentos)</h3>
+                <div class="linha-valor">
+                    <span>Salário Base (220h):</span>
+                    <span id="resSalarioBase">R$ 0,00</span>
+                </div>
+                <div class="linha-valor">
+                    <span>Horas Extras (50%):</span>
+                    <span id="resHorasExtras">R$ 0,00</span>
+                </div>
+                <div class="linha-valor">
+                    <span>Outros Proventos:</span>
+                    <span id="resOutrosProventos">R$ 0,00</span>
+                </div>
+                <div class="linha-valor total">
+                    <span>Total de Proventos:</span>
+                    <span id="resTotalProventos">R$ 0,00</span>
+                </div>
+            </div>
+
+            <!-- Descontos -->
+            <div class="bloco-resumo">
+                <h3>(-) Descontos</h3>
+                <div class="linha-valor">
+                    <span>Desconto Faltas/Atrasos:</span>
+                    <span id="resDescFaltas">R$ 0,00</span>
+                </div>
+                <div class="linha-valor">
+                    <span>INSS:</span>
+                    <span id="resInss">R$ 0,00</span>
+                </div>
+                <div class="linha-valor">
+                    <span>IRRF:</span>
+                    <span id="resIrrf">R$ 0,00</span>
+                </div>
+                <div class="linha-valor total">
+                    <span>Total de Descontos:</span>
+                    <span id="resTotalDescontos">R$ 0,00</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="liquido-box">
+            <h3>Valor Líquido a Receber</h3>
+            <div class="valor-liquido" id="resValorLiquido">R$ 0,00</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function formatarMoeda(valor) {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function calcularINSS(salarioBruto) {
+        let inss = 0;
+        if (salarioBruto <= 1412.00) {
+            inss = salarioBruto * 0.075;
+        } else if (salarioBruto <= 2666.68) {
+            inss = (1412.00 * 0.075) + ((salarioBruto - 1412.00) * 0.09);
+        } else if (salarioBruto <= 4000.03) {
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((salarioBruto - 2666.68) * 0.12);
+        } else if (salarioBruto <= 7786.02) {
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((4000.03 - 2666.68) * 0.12) + ((salarioBruto - 4000.03) * 0.14);
+        } else {
+            inss = 908.86;
+        }
+        return inss;
+    }
+
+    function calcularIRRF(baseCalculo) {
+        let irrf = 0;
+        if (baseCalculo <= 2259.20) {
+            irrf = 0;
+        } else if (baseCalculo <= 2826.65) {
+            irrf = (baseCalculo * 0.075) - 169.44;
+        } else if (baseCalculo <= 3751.05) {
+            irrf = (baseCalculo * 0.15) - 381.44;
+        } else if (baseCalculo <= 4664.68) {
+            irrf = (baseCalculo * 0.225) - 662.77;
+        } else {
+            irrf = (baseCalculo * 0.275) - 896.00;
+        }
+        return irrf < 0 ? 0 : irrf;
+    }
+
+    function calcularFolha() {
+        let salarioBase = parseFloat(document.getElementById('salarioBase').value) || 0;
+        let qtdHE = parseFloat(document.getElementById('horasExtras').value) || 0;
+        let qtdFaltas = parseFloat(document.getElementById('faltasAtrasos').value) || 0;
+        let outrosProventos = parseFloat(document.getElementById('outrosProventos').value) || 0;
+
+        let valorHora = salarioBase / 220;
+        let valorHE = qtdHE * (valorHora * 1.5);
+        let valorFaltas = qtdFaltas * valorHora;
+
+        let totalProventos = salarioBase + valorHE + outrosProventos;
+        let baseInss = totalProventos - valorFaltas;
+        let valorInss = calcularINSS(baseInss);
+
+        let baseIrrf = baseInss - valorInss;
+        let valorIrrf = calcularIRRF(baseIrrf);
+
+        let totalDescontos = valorFaltas + valorInss + valorIrrf;
+        let valorLiquido = totalProventos - totalDescontos;
+
+        document.getElementById('resSalarioBase').textContent = formatarMoeda(salarioBase);
+        document.getElementById('resHorasExtras').textContent = formatarMoeda(valorHE);
+        document.getElementById('resOutrosProventos').textContent = formatarMoeda(outrosProventos);
+        document.getElementById('resTotalProventos').textContent = formatarMoeda(totalProventos);
+
+        document.getElementById('resDescFaltas').textContent = formatarMoeda(valorFaltas);
+        document.getElementById('resInss').textContent = formatarMoeda(valorInss);
+        document.getElementById('resIrrf').textContent = formatarMoeda(valorIrrf);
+        document.getElementById('resTotalDescontos').textContent = formatarMoeda(totalDescontos);
+
+        document.getElementById('resValorLiquido').textContent = formatarMoeda(valorLiquido);
+    }
+
+    window.onload = calcularFolha;
+</script>
+
+</body>
+</html>
