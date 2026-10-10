@@ -34,6 +34,35 @@
             margin: 0 auto;
         }
 
+        /* BANNER COM O SLOGAN / IDENTIDADE VISUAL */
+        .banner-topo {
+            background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 24px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .banner-topo h1 {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 0 0 8px 0;
+            letter-spacing: 1px;
+            color: #ffffff;
+        }
+
+        .banner-topo p {
+            margin: 0;
+            font-size: 0.95rem;
+            color: #93c5fd;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-weight: 600;
+        }
+
         header {
             display: flex;
             justify-content: space-between;
@@ -46,8 +75,8 @@
             border-left: 6px solid var(--primary);
         }
 
-        h1 {
-            font-size: 1.35rem;
+        header h2 {
+            font-size: 1.25rem;
             font-weight: 800;
             margin: 0;
             color: var(--primary);
@@ -269,12 +298,18 @@
 </head>
 <body>
 
-    <!-- SISTEMA PRINCIPAL SEM SENHA -->
     <div class="container" style="padding-top: 10px;">
+        
+        <!-- BANNER COM O SLOGAN DA IDENTIDADE VISUAL -->
+        <div class="banner-topo">
+            <h1>AMF SISTEMA-DP</h1>
+            <p>Sistema - Departamento Pessoal</p>
+        </div>
+
         <header>
             <div>
-                <h1>AMF SISTEMA-DP</h1>
-                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Gestão de Departamento Pessoal &bull; Base 220h</div>
+                <h2>Painel de Gestão</h2>
+                <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Departamento Pessoal &bull; Base 220h</div>
             </div>
             <div class="badge-sistema">Ativo</div>
         </header>
