@@ -424,7 +424,7 @@
                     <div style="display: flex; gap: 10px; align-items: center;">
                         <div class="form-group" style="margin:0;">
                             <label style="font-size: 0.65rem;">Mês</label>
-                            <select id="lancMes" style="padding: 6px 10px;">
+                            <select id="lancMes" style="padding: 6px 10px;" onchange="calcularFolha()">
                                 <option value="Janeiro">Janeiro</option>
                                 <option value="Fevereiro">Fevereiro</option>
                                 <option value="Março">Março</option>
@@ -433,15 +433,15 @@
                                 <option value="Junho">Junho</option>
                                 <option value="Julho">Julho</option>
                                 <option value="Agosto">Agosto</option>
-                                <option value="Setembro">Setembro</option>
-                                <option value="Outubro" selected>Outubro</option>
+                                <option value="Setembro" selected>Setembro</option>
+                                <option value="Outubro">Outubro</option>
                                 <option value="Novembro">Novembro</option>
                                 <option value="Dezembro">Dezembro</option>
                             </select>
                         </div>
                         <div class="form-group" style="margin:0; width: 90px;">
                             <label style="font-size: 0.65rem;">Ano</label>
-                            <input type="number" id="lancAno" value="2026" style="padding: 6px 10px;">
+                            <input type="number" id="lancAno" value="2026" style="padding: 6px 10px;" oninput="calcularFolha()">
                         </div>
                     </div>
                 </div>
@@ -482,6 +482,7 @@
                     </div>
                 </div>
 
+                <!-- Lista dinâmica limpa (só aparece o que for adicionado) -->
                 <div id="containerLancamentosRubricas"></div>
 
                 <button class="btn-acao" onclick="salvarLancamento()" style="margin-top: 20px; background-color: #0d9488;">💾 Salvar Lançamento no JSONBin</button>
@@ -536,7 +537,7 @@
                 
                 <div class="info-funcionario">
                     <div>Funcionário: <strong id="outNome">Selecione acima</strong></div>
-                    <div>Competência: <strong id="outCompetencia">Outubro/2026</strong></div>
+                    <div>Competência: <strong id="outCompetencia">Setembro/2026</strong></div>
                 </div>
 
                 <div class="resultado-grid">
@@ -693,6 +694,7 @@
         let tbFunc = document.getElementById('tabelaFuncionarios');
         tbFunc.innerHTML = '';
         let selectFiltro = document.getElementById('filtroFuncionario');
+        let valorAtualFunc = selectFiltro.value;
         selectFiltro.innerHTML = '<option value="">Selecione o funcionário...</option>';
 
         funcionarios.forEach((f, index) => {
@@ -708,6 +710,7 @@
             </tr>`;
             selectFiltro.innerHTML += `<option value="${index}">${f.nome} - ${f.cargo}</option>`;
         });
+        selectFiltro.value = valorAtualFunc;
 
         let tbRub = document.getElementById('tabelaRubricas');
         tbRub.innerHTML = '';
@@ -756,290 +759,3 @@
         lancamentosAtivos[r.num] = {
             desc: r.desc,
             tipo: r.tipo,
-            calculo: r.calculo,
-            inss: r.inss,
-            irrf: r.irrf,
-            valor: 0,
-            qtdHoras: 0
-        };
-
-        renderizarLancamentosRubricas();
-        calcularFolha();
-    }
-
-    function removerRubricaLancamento(num) {
-        delete lancamentosAtivos[num];
-        renderizarLancamentosRubricas();
-        calcularFolha();
-    }
-
-    function renderizarLancamentosRubricas() {
-        let container = document.getElementById('containerLancamentosRubricas');
-        container.innerHTML = "";
-
-        for(let num in lancamentosAtivos) {
-            let item = lancamentosAtivos[num];
-            let htmlInput = "";
-
-            if(item.calculo === 'manual') {
-                htmlInput = `<div class="form-group" style="flex:1; margin:0;"><label>Valor (R$)</label><input type="number" step="0.01" value="${item.valor}" oninput="atualizarValorRubrica('${num}', this.value)"></div>`;
-            } else {
-                htmlInput = `<div class="form-group" style="flex:1; margin:0;"><label>Quantidade de Horas</label><input type="number" step="0.5" value="${item.qtdHoras}" oninput="atualizarQtdHoras('${num}', this.value)"></div>`;
-            }
-
-            container.innerHTML += `
-                <div style="display: flex; gap: 10px; align-items: center; background: #f1f5f9; padding: 12px; border-radius: 8px; margin-bottom: 10px;">
-                    <div style="flex: 2; font-size: 0.9rem;"><strong>${num} - ${item.desc}</strong> (${item.tipo})</div>
-                    ${htmlInput}
-                    <button onclick="removerRubricaLancamento('${num}')" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; height: 42px; margin-top: 18px;">🗑️</button>
-                </div>
-            `;
-        }
-    }
-
-    function atualizarValorRubrica(num, val) {
-        if(lancamentosAtivos[num]) {
-            lancamentosAtivos[num].valor = parseFloat(val) || 0;
-            calcularFolha();
-        }
-    }
-
-    function atualizarQtdHoras(num, val) {
-        if(lancamentosAtivos[num]) {
-            lancamentosAtivos[num].qtdHoras = parseFloat(val) || 0;
-            calcularFolha();
-        }
-    }
-
-    // Tabela Progressiva Oficial de INSS (2026)
-    function calcularInss(salarioBase) {
-        let inss = 0;
-        if (salarioBase <= 1518.00) {
-            inss = salarioBase * 0.075;
-        } else if (salarioBase <= 2793.88) {
-            inss = (1518.00 * 0.075) + ((salarioBase - 1518.00) * 0.09);
-        } else if (salarioBase <= 4190.83) {
-            inss = (1518.00 * 0.075) + ((2793.88 - 1518.00) * 0.09) + ((salarioBase - 2793.88) * 0.12);
-        } else if (salarioBase <= 7786.02) {
-            inss = (1518.00 * 0.075) + ((2793.88 - 1518.00) * 0.09) + ((4190.83 - 2793.88) * 0.12) + ((salarioBase - 4190.83) * 0.14);
-        } else {
-            inss = 908.85;
-        }
-        return inss;
-    }
-
-    // Tabela de Incidência e Redução Mensal do IRRF 2026 (Isenção efetiva até R$ 5.000,00)
-    function calcularIrrf(baseIrrf) {
-        let irrf = 0;
-        if (baseIrrf <= 5000.00) {
-            irrf = 0;
-        } else if (baseIrrf <= 7350.00) {
-            let impostoBruto = (baseIrrf * 0.275) - 896.00;
-            let reducao = 978.62 - (0.133145 * baseIrrf);
-            irrf = impostoBruto - reducao;
-        } else {
-            irrf = (baseIrrf * 0.275) - 896.00;
-        }
-        return irrf > 0 ? irrf : 0;
-    }
-
-    function calcularFolha() {
-        let salarioBase = parseFloat(document.getElementById('lancSalarioBase').value) || 0;
-        let diasUteis = parseFloat(document.getElementById('lancDiasUteis').value) || 25;
-        let domingos = parseFloat(document.getElementById('lancDomingos').value) || 5;
-
-        let idxFunc = document.getElementById('filtroFuncionario').value;
-        let nomeFunc = idxFunc !== "" ? funcionarios[idxFunc].nome : "Colaborador Não Selecionado";
-        let mes = document.getElementById('lancMes').value;
-        let ano = document.getElementById('lancAno').value;
-
-        document.getElementById('outNome').innerText = nomeFunc;
-        document.getElementById('outCompetencia').innerText = `${mes}/${ano}`;
-        document.getElementById('resSalarioBase').innerText = `R$ ${salarioBase.toFixed(2)}`;
-
-        let totalProventos = salarioBase;
-        let totalDescontos = 0;
-        let baseInss = salarioBase;
-        let baseIrrf = salarioBase;
-
-        let htmlProv = "";
-        let htmlDesc = "";
-
-        let valorHoraNormal = salarioBase / 220;
-
-        for(let num in lancamentosAtivos) {
-            let item = lancamentosAtivos[num];
-            let valorCalculado = item.valor;
-
-            if(item.calculo === 'he60') {
-                valorCalculado = valorHoraNormal * 1.60 * item.qtdHoras;
-                item.valor = valorCalculado;
-            } else if(item.calculo === 'he100') {
-                valorCalculado = valorHoraNormal * 2.00 * item.qtdHoras;
-                item.valor = valorCalculado;
-            } else if(item.calculo === 'dsr') {
-                let totalHE = 0;
-                for(let n in lancamentosAtivos) {
-                    if(lancamentosAtivos[n].calculo === 'he60' || lancamentosAtivos[n].calculo === 'he100') {
-                        totalHE += lancamentosAtivos[n].valor;
-                    }
-                }
-                valorCalculado = diasUteis > 0 ? (totalHE / diasUteis) * domingos : 0;
-                item.valor = valorCalculado;
-            } else if(item.calculo === 'faltas') {
-                valorCalculado = valorHoraNormal * item.qtdHoras;
-                item.valor = valorCalculado;
-            }
-
-            if(item.tipo === 'Provento') {
-                totalProventos += valorCalculado;
-                if(item.inss === 'Sim') baseInss += valorCalculado;
-                if(item.irrf === 'Sim') baseIrrf += valorCalculado;
-                htmlProv += `<div class="linha-valor"><span>${num} - ${item.desc}:</span> <span>R$ ${valorCalculado.toFixed(2)}</span></div>`;
-            } else {
-                totalDescontos += valorCalculado;
-                if(item.inss === 'Sim') baseInss -= valorCalculado;
-                if(item.irrf === 'Sim') baseIrrf -= valorCalculado;
-                htmlDesc += `<div class="linha-valor"><span>${num} - ${item.desc}:</span> <span>R$ ${valorCalculado.toFixed(2)}</span></div>`;
-            }
-        }
-
-        let valorInss = calcularInss(baseInss);
-        let baseIrrfTributavel = baseIrrf - valorInss;
-        let valorIrrf = calcularIrrf(baseIrrfTributavel);
-
-        totalDescontos += valorInss + valorIrrf;
-        let valorLiquido = totalProventos - totalDescontos;
-
-        document.getElementById('listaResumoProventos').innerHTML = htmlProv;
-        document.getElementById('listaResumoDescontos').innerHTML = htmlDesc;
-        document.getElementById('resInss').innerText = `R$ ${valorInss.toFixed(2)}`;
-        document.getElementById('resIrrf').innerText = `R$ ${valorIrrf.toFixed(2)}`;
-        document.getElementById('resTotalProventos').innerText = `R$ ${totalProventos.toFixed(2)}`;
-        document.getElementById('resTotalDescontos').innerText = `R$ ${totalDescontos.toFixed(2)}`;
-        document.getElementById('resValorLiquido').innerText = `R$ ${valorLiquido.toFixed(2)}`;
-    }
-
-    async function carregarHistoricoJsonBin() {
-        try {
-            let response = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-                headers: { 'X-Master-Key': JSONBIN_API_KEY }
-            });
-            let data = await response.json();
-            historicoGlobal = data.record.historico || [];
-            renderizarHistorico();
-        } catch (error) {
-            console.error("Erro ao carregar do JSONBin:", error);
-            document.getElementById('tabelaHistorico').innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Erro ao carregar dados da nuvem.</td></tr>`;
-        }
-    }
-
-    async function salvarLancamento() {
-        let idxFunc = document.getElementById('filtroFuncionario').value;
-        if(idxFunc === "") { alert("Selecione um funcionário para salvar o lançamento!"); return; }
-
-        let f = funcionarios[idxFunc];
-        let mes = document.getElementById('lancMes').value;
-        let ano = document.getElementById('lancAno').value;
-        let salarioBase = parseFloat(document.getElementById('lancSalarioBase').value) || 0;
-        let liquidoStr = document.getElementById('resValorLiquido').innerText;
-
-        let novoRegistro = {
-            nome: f.nome,
-            competencia: `${mes}/${ano}`,
-            salarioBase: salarioBase,
-            liquido: liquidoStr
-        };
-
-        try {
-            let responseGet = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}/latest`, {
-                headers: { 'X-Master-Key': JSONBIN_API_KEY }
-            });
-            let data = await responseGet.json();
-            let listaAtual = data.record.historico || [];
-
-            listaAtual.push(novoRegistro);
-
-            let responsePut = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': JSONBIN_API_KEY
-                },
-                body: JSON.stringify({ historico: listaAtual })
-            });
-
-            if (responsePut.ok) {
-                alert("Lançamento salvo com sucesso no JSONBin!");
-                await carregarHistoricoJsonBin();
-            } else {
-                alert("Erro ao salvar no JSONBin.");
-            }
-        } catch (error) {
-            console.error("Erro ao salvar:", error);
-            alert("Falha de conexão ao tentar salvar na nuvem.");
-        }
-    }
-
-    function renderizarHistorico() {
-        let tb = document.getElementById('tabelaHistorico');
-        let filtroMes = document.getElementById('filtroHistoricoMes').value;
-        let filtroNome = document.getElementById('filtroHistoricoNome').value.toLowerCase();
-
-        tb.innerHTML = "";
-
-        let filtrados = historicoGlobal.filter(h => {
-            let matchMes = filtroMes === "" || h.competencia.includes(filtroMes);
-            let matchNome = h.nome.toLowerCase().includes(filtroNome);
-            return matchMes && matchNome;
-        });
-
-        if(filtrados.length === 0) {
-            tb.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Nenhum lançamento encontrado.</td></tr>`;
-            return;
-        }
-
-        filtrados.forEach((h, index) => {
-            tb.innerHTML += `
-                <tr>
-                    <td>${h.nome}</td>
-                    <td>${h.competencia}</td>
-                    <td>R$ ${h.salarioBase.toFixed(2)}</td>
-                    <td><strong>${h.liquido}</strong></td>
-                    <td>
-                        <button onclick="excluirHistoricoNuven(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    async function excluirHistoricoNuven(index) {
-        if(!confirm("Deseja realmente excluir este lançamento do histórico?")) return;
-
-        historicoGlobal.splice(index, 1);
-
-        try {
-            let responsePut = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': JSONBIN_API_KEY
-                },
-                body: JSON.stringify({ historico: historicoGlobal })
-            });
-
-            if(responsePut.ok) {
-                alert("Lançamento excluído com sucesso!");
-                renderizarHistorico();
-            } else {
-                alert("Erro ao atualizar o JSONBin.");
-            }
-        } catch(error) {
-            console.error("Erro ao excluir:", error);
-            alert("Falha ao conectar com o JSONBin.");
-        }
-    }
-</script>
-</body>
-</html>
