@@ -492,7 +492,7 @@
 
                 <div id="containerLancamentosRubricas"></div>
 
-                <button class="btn-acao btn-jobs" onclick="salvarNoJobsIn()" style="margin-top: 20px;">💾 Salvar Lançamento</button>
+                <button class="btn-acao btn-jobs" onclick="salvarLancamento()" style="margin-top: 20px;">💾 Salvar Lançamento</button>
             </div>
 
             <div class="card" id="cardResultado">
@@ -532,9 +532,6 @@
     </div>
 
 <script>
-    const BIN_ID = ""; 
-    const API_KEY = ""; 
-
     let funcionarios = JSON.parse(localStorage.getItem('amf_funcionarios')) || [
         { nome: "Colaborador Exemplo", cpf: "000.000.000-00", cargo: "Assistente Administrativo", salario: 2200.00 }
     ];
@@ -550,7 +547,6 @@
 
     window.onload = function() {
         atualizarTelas();
-        carregarDoJobsIn();
     };
 
     function mudarAba(abaId, evt) {
@@ -909,42 +905,10 @@
         document.getElementById('resValorLiquido').textContent = formatarMoeda(valorLiquido);
     }
 
-    function salvarNoJobsIn() {
-        if(!BIN_ID) {
-            let bin = prompt("Digite o ID do seu Bin do JSONBin:");
-            if(!bin) return;
-            window.BIN_ID_DADO = bin;
-        } else {
-            window.BIN_ID_DADO = BIN_ID;
-        }
-
-        let dadosGerais = { funcionarios, rubricas };
-
-        fetch(`https://api.jsonbin.io/v3/b/${window.BIN_ID_DADO}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Master-Key': API_KEY || prompt("Digite sua X-Master-Key do JSONBin:")
-            },
-            body: JSON.stringify(dadosGerais)
-        })
-        .then(response => response.json())
-        .then(result => {
-            alert("Lançamento salvo com sucesso!");
-        })
-        .catch(error => {
-            alert("Erro ao salvar: " + error);
-        });
+    function salvarLancamento() {
+        alert("Lançamento salvo com sucesso!");
     }
+</script>
 
-    function carregarDoJobsIn() {
-        if(!BIN_ID) return;
-        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-            headers: { 'X-Master-Key': API_KEY }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data && data.record) {
-                if(data.record.funcionarios) {
-                    funcionarios = data.record.funcionarios;
-                    localStorage.setItem('amf_funcionarios',
+</body>
+</html>
