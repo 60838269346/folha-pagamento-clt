@@ -433,8 +433,8 @@
                                 <option value="Junho">Junho</option>
                                 <option value="Julho">Julho</option>
                                 <option value="Agosto">Agosto</option>
-                                <option value="Setembro">Setembro</option>
-                                <option value="Outubro" selected>Outubro</option>
+                                <option value="Setembro" selected>Setembro</option>
+                                <option value="Outubro">Outubro</option>
                                 <option value="Novembro">Novembro</option>
                                 <option value="Dezembro">Dezembro</option>
                             </select>
@@ -536,7 +536,7 @@
                 
                 <div class="info-funcionario">
                     <div>Funcionário: <strong id="outNome">Selecione acima</strong></div>
-                    <div>Competência: <strong id="outCompetencia">Outubro/2026</strong></div>
+                    <div>Competência: <strong id="outCompetencia">Setembro/2026</strong></div>
                 </div>
 
                 <div class="resultado-grid">
@@ -572,15 +572,28 @@
     const JSONBIN_API_KEY = "$2a$10$2gRuysiXM85zMZ4OTG2dU.AEaN0WyPHJveZ2wy62/tqidY73EOJBS";
 
     let funcionarios = JSON.parse(localStorage.getItem('amf_funcionarios')) || [
-        { nome: "Colaborador Exemplo", cpf: "000.000.000-00", cargo: "Assistente Administrativo", salario: 2200.00 }
+        { nome: "Ailton Moraes Furtado", cpf: "000.000.000-00", cargo: "Analista Contábil", salario: 4283.37 }
     ];
 
-    let rubricas = JSON.parse(localStorage.getItem('amf_rubricas')) || [
-        { num: "001", desc: "Salário Base", tipo: "Provento", calculo: "manual", inss: "Sim", irrf: "Sim" },
-        { num: "002", desc: "Horas Extras 60%", tipo: "Provento", calculo: "he60", inss: "Sim", irrf: "Sim" },
-        { num: "003", desc: "DSR sobre Horas Extras", tipo: "Provento", calculo: "dsr", inss: "Sim", irrf: "Sim" },
-        { num: "004", desc: "Faltas / Atrasos", tipo: "Desconto", calculo: "faltas", inss: "Nao", irrf: "Nao" }
+    // Rubricas oficiais restauradas e configuradas corretamente
+    let rubricas = [
+        { num: "001", desc: "SALÁRIO BASE", tipo: "Provento", calculo: "manual", inss: "Sim", irrf: "Sim" },
+        { num: "002", desc: "AJUDA DE CUSTO", tipo: "Provento", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "003", desc: "HORAS EXTRAS 60%", tipo: "Provento", calculo: "he60", inss: "Sim", irrf: "Sim" },
+        { num: "004", desc: "HORAS EXTRAS 100%", tipo: "Provento", calculo: "he100", inss: "Sim", irrf: "Sim" },
+        { num: "005", desc: "DSR HORAS EXTRAS", tipo: "Provento", calculo: "dsr", inss: "Sim", irrf: "Sim" },
+        { num: "006", desc: "FERIADO", tipo: "Provento", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "100", desc: "DESCONTO VALE TRANSPORTE", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "101", desc: "DESC PLANO SAUDE", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "102", desc: "CONSIGNADO 1", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "103", desc: "CONSIGNADO 2", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "104", desc: "CONSIGNADO 3", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "105", desc: "CONSIGNADO 4", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "106", desc: "GYMPASS", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "107", desc: "PLANO ODONTOLOGICO", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" },
+        { num: "108", desc: "OUTROS DESCONTOS", tipo: "Desconto", calculo: "manual", inss: "Nao", irrf: "Nao" }
     ];
+    localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
 
     let historicoGlobal = [];
     let lancamentosAtivos = {};
@@ -799,6 +812,7 @@
         }
     }
 
+    // Cálculo Progressivo Oficial de INSS
     function calcularInss(salarioBase) {
         let inss = 0;
         if (salarioBase <= 1518.00) {
@@ -815,6 +829,7 @@
         return inss;
     }
 
+    // Cálculo Oficial de IRRF
     function calcularIrrf(baseIrrf) {
         let irrf = 0;
         if (baseIrrf <= 2259.20) {
@@ -1030,4 +1045,4 @@
     }
 </script>
 </body>
-</html>
+</html>    
