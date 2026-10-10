@@ -34,7 +34,6 @@
             margin: 0 auto;
         }
 
-        /* BANNER COM O SLOGAN / IDENTIDADE VISUAL */
         .banner-topo {
             background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
             border-radius: var(--radius);
@@ -92,7 +91,6 @@
             text-transform: uppercase;
         }
 
-        /* ABAS DO SISTEMA */
         .tabs {
             display: flex;
             gap: 10px;
@@ -193,10 +191,6 @@
 
         .btn-acao:hover {
             background-color: var(--primary-hover);
-        }
-
-        .btn-jobs {
-            background-color: #0d9488;
         }
 
         table {
@@ -300,7 +294,6 @@
 
     <div class="container" style="padding-top: 10px;">
         
-        <!-- BANNER COM O SLOGAN DA IDENTIDADE VISUAL -->
         <div class="banner-topo">
             <h1>AMF SISTEMA-DP</h1>
             <p>Sistema - Departamento Pessoal</p>
@@ -314,7 +307,6 @@
             <div class="badge-sistema">Ativo</div>
         </header>
 
-        <!-- ABAS DE NAVEGAÇÃO -->
         <div class="tabs">
             <button class="tab-btn active" onclick="mudarAba('funcionarios', event)">1. Funcionários</button>
             <button class="tab-btn" onclick="mudarAba('rubricas', event)">2. Rubricas</button>
@@ -424,7 +416,7 @@
             </div>
         </div>
 
-        <!-- ABA 3: LANÇAMENTOS E HOLERITE -->
+        <!-- ABA 3: LANÇAMENTOS E HISTÓRICO -->
         <div id="aba-lancamentos" class="tab-content">
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -492,10 +484,10 @@
 
                 <div id="containerLancamentosRubricas"></div>
 
-                <button class="btn-acao btn-jobs" onclick="salvarLancamento()" style="margin-top: 20px;">💾 Salvar Lançamento</button>
+                <button class="btn-acao" onclick="salvarLancamento()" style="margin-top: 20px; background-color: #0d9488;">💾 Salvar Lançamento</button>
             </div>
 
-            <!-- CARD DE HISTÓRICO E FILTRO DE LANÇAMENTOS SALVOS -->
+            <!-- HISTÓRICO DE LANÇAMENTOS SALVOS -->
             <div class="card">
                 <h2>📂 Histórico de Lançamentos Salvos</h2>
                 <div class="form-grid" style="margin-bottom: 15px;">
@@ -698,7 +690,7 @@
                     <button onclick="excluirFuncionario(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button>
                 </td>
             </tr>`;
-            selectFiltro.innerHTML += `<option value="${index}">${f.nome} -${f.cargo}</option>`;
+            selectFiltro.innerHTML += `<option value="${index}">${f.nome} - ${f.cargo}</option>`;
         });
 
         let tbRub = document.getElementById('tabelaRubricas');
@@ -771,4 +763,155 @@
 
             if(r.calculo === "dsr") {
                 container.innerHTML += `
-                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px; background: #f0fdf4; padding
+                    <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px; background: #f0fdf4; padding: 10px; border-radius: 8px; border: 1px solid #bbf7d0;">
+                        <div style="flex: 1;">
+                            <label style="color: #047857; margin:0; font-size: 0.8rem;"><strong>${r.desc}</strong> (DSR Automático)</label>
+                            <input type="text" value="Calculado Automaticamente" disabled style="background: #e6f4ea; color: #065f46; font-weight: 600; margin-top: 4px;">
+                        </div>
+                        <button onclick="removerRubricaLancamento(${indexRub})" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; height: 38px; margin-top: 14px;">🗑️</button>
+                    </div>
+                `;
+                return;
+            }
+
+            let rotulo = `Valor (R$) para ${r.desc} (${r.tipo})`;
+            if(r.calculo === "he60" || r.calculo === "he100" || r.calculo === "faltas") {
+                rotulo = `Qtd de Horas para: ${r.desc}`;
+            }
+
+            container.innerHTML += `
+                <div style="display: flex; gap: 10px; align-items: center; margin-bottom: 12px;">
+                    <div class="form-group" style="flex: 1; margin: 0;">
+                        <label>${rotulo}</label>
+                        <input type="number" id="lanc_rub_${indexRub}" step="0.5" value="${lancamentosAtivos[indexRub]}" data-calculo="${r.calculo}" data-tipo="${r.tipo}" oninput="atualizarValorLancamento(${indexRub})">
+                    </div>
+                    <button onclick="removerRubricaLancamento(${indexRub})" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; height: 38px; margin-top: 14px;" title="Remover rubrica">🗑️</button>
+                </div>
+            `;
+        });
+    }
+
+    function atualizarValorLancamento(indexRub) {
+        let inputEl = document.getElementById(`lanc_rub_${indexRub}`);
+        if(inputEl) {
+            lancamentosAtivos[indexRub] = parseFloat(inputEl.value) || 0;
+        }
+        calcularFolha();
+    }
+
+    function carregarFuncionarioSelecionado() {
+        let index = document.getElementById('filtroFuncionario').value;
+        if(index === "") return;
+        let f = funcionarios[index];
+        document.getElementById('lancSalarioBase').value = f.salario;
+        calcularFolha();
+    }
+
+    function formatarMoeda(valor) {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function calcularINSS(salarioBruto) {
+        let inss = 0;
+        if (salarioBruto <= 1412.00) {
+            inss = salarioBruto * 0.075;
+        } else if (salarioBruto <= 2666.68) {
+            inss = (1412.00 * 0.075) + ((salarioBruto - 1412.00) * 0.09);
+        } else if (salarioBruto <= 4000.03) {
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((salarioBruto - 2666.68) * 0.12);
+        } else if (salarioBruto <= 7786.02) {
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((4000.03 - 2666.68) * 0.12) + ((salarioBruto - 4000.03) * 0.14);
+        } else {
+            inss = 908.86;
+        }
+        return inss;
+    }
+
+    function calcularIRRF(baseCalculo, salarioBruto) {
+        if (salarioBruto <= 5000.00 || baseCalculo <= 5000.00) {
+            return 0;
+        }
+
+        let irrf = 0;
+        if (baseCalculo <= 2259.20) {
+            irrf = 0;
+        } else if (baseCalculo <= 2826.65) {
+            irrf = (baseCalculo * 0.075) - 169.44;
+        } else if (baseCalculo <= 3751.05) {
+            irrf = (baseCalculo * 0.15) - 381.44;
+        } else if (baseCalculo <= 4664.68) {
+            irrf = (baseCalculo * 0.225) - 662.77;
+        } else {
+            irrf = (baseCalculo * 0.275) - 896.00;
+        }
+        return irrf < 0 ? 0 : irrf;
+    }
+
+    function calcularFolha() {
+        let index = document.getElementById('filtroFuncionario').value;
+        let nome = "Colaborador Exemplo";
+        let cargo = "Assistente";
+
+        if(index !== "" && funcionarios[index]) {
+            nome = funcionarios[index].nome;
+            cargo = funcionarios[index].cargo;
+        }
+
+        let salarioBase = parseFloat(document.getElementById('lancSalarioBase').value) || 0;
+        let diasUteis = parseFloat(document.getElementById('lancDiasUteis').value) || 25;
+        let domingos = parseFloat(document.getElementById('lancDomingos').value) || 5;
+        let mes = document.getElementById('lancMes').value;
+        let ano = document.getElementById('lancAno').value;
+
+        let valorHora = salarioBase / 220;
+
+        let totalProventos = salarioBase;
+        let totalDescontos = 0;
+        let baseInss = salarioBase;
+
+        let valorTotalHorasExtras = 0;
+
+        Object.keys(lancamentosAtivos).forEach(indexRub => {
+            let r = rubricas[indexRub];
+            if(r && (r.calculo === "he60" || r.calculo === "he100")) {
+                let qtdHoras = lancamentosAtivos[indexRub] || 0;
+                if(r.calculo === "he60") {
+                    valorTotalHorasExtras += qtdHoras * (valorHora * 1.6);
+                } else if(r.calculo === "he100") {
+                    valorTotalHorasExtras += qtdHoras * (valorHora * 2.0);
+                }
+            }
+        });
+
+        let htmlProventos = "";
+        let htmlDescontos = "";
+
+        Object.keys(lancamentosAtivos).forEach(indexRub => {
+            let r = rubricas[indexRub];
+            if(!r) return;
+
+            let valorCalculado = 0;
+
+            if(r.calculo === "dsr") {
+                valorCalculado = (valorTotalHorasExtras / diasUteis) * domingos;
+            } else {
+                let valorDigitado = lancamentosAtivos[indexRub] || 0;
+                if(r.calculo === "he60") {
+                    valorCalculado = valorDigitado * (valorHora * 1.6);
+                } else if(r.calculo === "he100") {
+                    valorCalculado = valorDigitado * (valorHora * 2.0);
+                } else if(r.calculo === "faltas") {
+                    valorCalculado = valorDigitado * valorHora;
+                } else {
+                    valorCalculado = valorDigitado;
+                }
+            }
+
+            if(valorCalculado > 0) {
+                if(r.tipo === "Provento") {
+                    totalProventos += valorCalculado;
+                    if(r.inss === "Sim") baseInss += valorCalculado;
+                    htmlProventos += `<div class="linha-valor"><span>${r.desc}:</span> <span>${formatarMoeda(valorCalculado)}</span></div>`;
+                } else {
+                    totalDescontos += valorCalculado;
+                    if(r.
