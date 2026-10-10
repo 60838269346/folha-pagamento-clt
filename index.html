@@ -493,7 +493,7 @@
                 <div class="form-grid" style="margin-bottom: 15px;">
                     <div class="form-group">
                         <label>Filtrar por Ano</label>
-                        <input type="number" id="filtroHistoricoAno" value="2026" placeholder="Ex: 2026" oninput="renderizarHistorico()">
+                        <input type="text" id="filtroHistoricoAno" value="" placeholder="Todos os Anos" oninput="renderizarHistorico()">
                     </div>
                     <div class="form-group">
                         <label>Filtrar por Mês</label>
@@ -743,12 +743,11 @@
         let idx = document.getElementById('filtroFuncionario').value;
         if(idx === "") {
             document.getElementById('lancSalarioBase').value = "";
+            calcularFolha();
             return;
         }
         let f = funcionarios[idx];
         document.getElementById('lancSalarioBase').value = f.salario.toFixed(2);
-        lancamentosAtivos = {};
-        document.getElementById('containerLancamentosRubricas').innerHTML = "";
         calcularFolha();
     }
 
@@ -978,11 +977,9 @@
             if (responsePut.ok) {
                 alert("Lançamento salvo com sucesso no JSONBin!");
                 
-                // Limpa os campos da tela de lançamento e limpa a lista dinâmica
+                // Limpa apenas as rubricas dinâmicas, mantendo o funcionário selecionado intacto
                 lancamentosAtivos = {};
                 document.getElementById('containerLancamentosRubricas').innerHTML = "";
-                document.getElementById('filtroFuncionario').value = "";
-                document.getElementById('lancSalarioBase').value = "";
                 calcularFolha();
 
                 // Atualiza o histórico na tela
@@ -994,73 +991,3 @@
             console.error("Erro ao salvar:", error);
             alert("Falha de conexão ao tentar salvar na nuvem.");
         }
-    }
-
-    function renderizarHistorico() {
-        let tb = document.getElementById('tabelaHistorico');
-        let filtroAno = document.getElementById('filtroHistoricoAno').value.trim();
-        let filtroMes = document.getElementById('filtroHistoricoMes').value;
-        let filtroNome = document.getElementById('filtroHistoricoNome').value.toLowerCase().trim();
-
-        tb.innerHTML = "";
-
-        let filtrados = historicoGlobal.filter(h => {
-            let nomeRegistro = (h.nome || "").toLowerCase();
-            let competenciaRegistro = (h.competencia || "");
-
-            let matchAno = filtroAno === "" || competenciaRegistro.includes(filtroAno);
-            let matchMes = filtroMes === "" || competenciaRegistro.includes(filtroMes);
-            let matchNome = filtroNome === "" || nomeRegistro.includes(filtroNome);
-
-            return matchAno && matchMes && matchNome;
-        });
-
-        if(filtrados.length === 0) {
-            tb.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Nenhum lançamento encontrado.</td></tr>`;
-            return;
-        }
-
-        filtrados.forEach((h, index) => {
-            tb.innerHTML += `
-                <tr>
-                    <td>${h.nome}</td>
-                    <td>${h.competencia}</td>
-                    <td>R$ ${h.salarioBase.toFixed(2)}</td>
-                    <td><strong>${h.liquido}</strong></td>
-                    <td>
-                        <button onclick="excluirHistoricoNuven(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button>
-                    </td>
-                </tr>
-            `;
-        });
-    }
-
-    async function excluirHistoricoNuven(index) {
-        if(!confirm("Deseja realmente excluir este lançamento do histórico?")) return;
-
-        historicoGlobal.splice(index, 1);
-
-        try {
-            let responsePut = await fetch(`https://api.jsonbin.io/v3/b/${JSONBIN_BIN_ID}`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Master-Key': JSONBIN_API_KEY
-                },
-                body: JSON.stringify({ historico: historicoGlobal })
-            });
-
-            if(responsePut.ok) {
-                alert("Lançamento excluído com sucesso!");
-                renderizarHistorico();
-            } else {
-                alert("Erro ao atualizar o JSONBin.");
-            }
-        } catch(error) {
-            console.error("Erro ao excluir:", error);
-            alert("Falha ao conectar com o JSONBin.");
-        }
-    }
-</script>
-</body>
-</html>
