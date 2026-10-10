@@ -29,7 +29,7 @@
             padding: 24px 16px;
         }
 
-        /* TELA DE LOGIN COM A SUA MARCA VISUAL */
+        /* TELA DE LOGIN */
         #telaLogin {
             position: fixed;
             top: 0;
@@ -174,8 +174,6 @@
             gap: 8px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            border-bottom: none;
-            padding-bottom: 0;
         }
 
         .form-grid {
@@ -232,10 +230,18 @@
             justify-content: center;
             align-items: center;
             gap: 8px;
+            margin-bottom: 10px;
         }
 
         .btn-acao:hover {
             background-color: var(--primary-hover);
+        }
+
+        .btn-jobs {
+            background-color: #0d9488;
+        }
+        .btn-jobs:hover {
+            background-color: #0f766e;
         }
 
         .resultado-grid {
@@ -390,6 +396,7 @@
                     </div>
                 </div>
                 <button class="btn-acao" onclick="calcularFolha()">🧮 Calcular Holerite</button>
+                <button class="btn-acao btn-jobs" onclick="salvarNoJobsIn()">☁️ Salvar no JSONBin (Jobsin)</button>
             </div>
 
             <div class="card" id="cardResultado">
@@ -455,12 +462,18 @@
     </div>
 
 <script>
+    // CONFIGURAÇÃO DO JSONBIN (JOBSIN)
+    // Se quiser, você pode preencher o seu Bin ID e Master Key aqui ou deixar para digitar se preferir:
+    const BIN_ID = ""; // Cole o ID do seu Bin do JSONBin aqui entre as aspas, ex: "6458..."
+    const API_KEY = ""; // Cole a sua X-Master-Key aqui entre as aspas se necessário
+
     function verificarSenha() {
-        let senha = document.getElementById('inputSenha').value;
-        if (senha === '0') {
+        let senha = document.getElementById('inputSenha').value.trim();
+        if (senha === "0") {
             document.getElementById('telaLogin').style.display = 'none';
             document.getElementById('sistemaPrincipal').style.display = 'block';
             calcularFolha();
+            carregarDoJobsIn();
         } else {
             let msg = document.getElementById('msgErro');
             msg.style.display = 'block';
@@ -538,7 +551,76 @@
 
         document.getElementById('resSalarioBase').textContent = formatarMoeda(salarioBase);
         document.getElementById('resHorasExtras').textContent = formatarMoeda(valorHE);
-        document.getElementById('resOutrosPro
-    
-    
- 
+        document.getElementById('resOutrosProventos').textContent = formatarMoeda(outrosProventos);
+        document.getElementById('resTotalProventos').textContent = formatarMoeda(totalProventos);
+
+        document.getElementById('resDescFaltas').textContent = formatarMoeda(valorFaltas);
+        document.getElementById('resInss').textContent = formatarMoeda(valorInss);
+        document.getElementById('resIrrf').textContent = formatarMoeda(valorIrrf);
+        document.getElementById('resTotalDescontos').textContent = formatarMoeda(totalDescontos);
+
+        document.getElementById('resValorLiquido').textContent = formatarMoeda(valorLiquido);
+    }
+
+    // FUNÇÕES DO JSONBIN
+    function salvarNoJobsIn() {
+        if(!BIN_ID) {
+            let bin = prompt("Digite o ID do seu Bin do JSONBin:");
+            if(!bin) return;
+            window.BIN_ID_DADO = bin;
+        } else {
+            window.BIN_ID_DADO = BIN_ID;
+        }
+
+        let dados = {
+            nome: document.getElementById('nomeFuncionario').value,
+            cargo: document.getElementById('cargoFuncionario').value,
+            salarioBase: document.getElementById('salarioBase').value,
+            horasExtras: document.getElementById('horasExtras').value,
+            faltasAtrasos: document.getElementById('faltasAtrasos').value,
+            outrosProventos: document.getElementById('outrosProventos').value
+        };
+
+        fetch(`https://api.jsonbin.io/v3/b/${window.BIN_ID_DADO}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': API_KEY || prompt("Digite sua X-Master-Key do JSONBin:")
+            },
+            body: JSON.stringify(dados)
+        })
+        .then(response => response.json())
+        .then(result => {
+            alert("Dados salvos com sucesso no JSONBin!");
+        })
+        .catch(error => {
+            alert("Erro ao salvar: " + error);
+        });
+    }
+
+    function carregarDoJobsIn() {
+        if(!BIN_ID) return;
+        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+            headers: {
+                'X-Master-Key': API_KEY
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data && data.record) {
+                let d = data.record;
+                if(d.nome) document.getElementById('nomeFuncionario').value = d.nome;
+                if(d.cargo) document.getElementById('cargoFuncionario').value = d.cargo;
+                if(d.salarioBase) document.getElementById('salarioBase').value = d.salarioBase;
+                if(d.horasExtras) document.getElementById('horasExtras').value = d.horasExtras;
+                if(d.faltasAtrasos) document.getElementById('faltasAtrasos').value = d.faltasAtrasos;
+                if(d.outrosProventos) document.getElementById('outrosProventos').value = d.outrosProventos;
+                calcularFolha();
+            }
+        })
+        .catch(err => console.log("Erro ao carregar dados do JSONBin"));
+    }
+</script>
+
+</body>
+</html>
