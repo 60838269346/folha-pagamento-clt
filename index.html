@@ -304,7 +304,7 @@
                 <h2>Painel de Gestão</h2>
                 <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Departamento Pessoal &bull; Base 220h</div>
             </div>
-            <div class="badge-sistema">Ativo</div>
+            <div class="badge-sistema">Ativo (Nuvem)</div>
         </header>
 
         <div class="tabs">
@@ -484,7 +484,7 @@
 
                 <div id="containerLancamentosRubricas"></div>
 
-                <button class="btn-acao" onclick="salvarLancamento()" style="margin-top: 20px; background-color: #0d9488;">💾 Salvar Lançamento</button>
+                <button class="btn-acao" onclick="salvarLancamento()" style="margin-top: 20px; background-color: #0d9488;">💾 Salvar Lançamento no JSONBin</button>
             </div>
 
             <!-- HISTÓRICO DE LANÇAMENTOS SALVOS -->
@@ -526,7 +526,7 @@
                         </tr>
                     </thead>
                     <tbody id="tabelaHistorico">
-                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Nenhum lançamento salvo ainda.</td></tr>
+                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Carregando lançamentos...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -568,6 +568,10 @@
     </div>
 
 <script>
+    // Configurações do JSONBin.io atualizadas com o novo Bin ID exclusivo
+    const JSONBIN_BIN_ID = "6aca9655ffd5d160535fdcec";
+    const JSONBIN_API_KEY = "$2a$10$2gRuysiXM85zMZ4OTG2dU.AEaN0WyPHJveZ2wy62/tqidY73EOJBS";
+
     let funcionarios = JSON.parse(localStorage.getItem('amf_funcionarios')) || [
         { nome: "Colaborador Exemplo", cpf: "000.000.000-00", cargo: "Assistente Administrativo", salario: 2200.00 }
     ];
@@ -579,11 +583,12 @@
         { num: "004", desc: "Faltas / Atrasos", tipo: "Desconto", calculo: "faltas", inss: "Nao", irrf: "Nao" }
     ];
 
+    let historicoGlobal = [];
     let lancamentosAtivos = {};
 
-    window.onload = function() {
+    window.onload = async function() {
         atualizarTelas();
-        renderizarHistorico();
+        await carregarHistoricoJsonBin();
     };
 
     function mudarAba(abaId, evt) {
@@ -624,4 +629,181 @@
         funcionarios[index] = {
             nome: novoNome || f.nome,
             cpf: novoCpf || f.cpf,
-            cargo
+            cargo: novoCargo || f.cargo,
+            salario: parseFloat(novoSalario) || f.salario
+        };
+        localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
+        atualizarTelas();
+        alert("Funcionário atualizado com sucesso!");
+    }
+
+    function excluirFuncionario(index) {
+        funcionarios.splice(index, 1);
+        localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
+        atualizarTelas();
+    }
+
+    function adicionarRubrica() {
+        let num = document.getElementById('rubNum').value;
+        let desc = document.getElementById('rubDesc').value;
+        let tipo = document.getElementById('rubTipo').value;
+        let calculo = document.getElementById('rubCalculo').value;
+        let inss = document.getElementById('rubInss').value;
+        let irrf = document.getElementById('rubIrrf').value;
+
+        if(!num || !desc) { alert("Preencha o número e a descrição da rubrica!"); return; }
+
+        rubricas.push({ num, desc, tipo, calculo, inss, irrf });
+        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+        atualizarTelas();
+        alert("Rubrica cadastrada com sucesso!");
+        document.getElementById('rubNum').value = '';
+        document.getElementById('rubDesc').value = '';
+    }
+
+    function editarRubrica(index) {
+        let r = rubricas[index];
+        let novaDesc = prompt("Editar Descrição:", r.desc);
+        if(novaDesc === null) return;
+
+        rubricas[index].desc = novaDesc || r.desc;
+        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+        atualizarTelas();
+        alert("Rubrica atualizada com sucesso!");
+    }
+
+    function excluirRubrica(index) {
+        rubricas.splice(index, 1);
+        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+        atualizarTelas();
+    }
+
+    function atualizarTelas() {
+        let tbFunc = document.getElementById('tabelaFuncionarios');
+        tbFunc.innerHTML = '';
+        let selectFiltro = document.getElementById('filtroFuncionario');
+        selectFiltro.innerHTML = '<option value="">Selecione o funcionário...</option>';
+
+        funcionarios.forEach((f, index) => {
+            tbFunc.innerHTML += `<tr>
+                <td>${f.nome}</td>
+                <td>${f.cpf || '-'}</td>
+                <td>${f.cargo}</td>
+                <td>R$ ${f.salario.toFixed(2)}</td>
+                <td>
+                    <button onclick="editarFuncionario(${index})" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-right:4px;">Editar</button>
+                    <button onclick="excluirFuncionario(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button>
+                </td>
+            </tr>`;
+            selectFiltro.innerHTML += `<option value="${index}">${f.nome} - ${f.cargo}</option>`;
+        });
+
+        let tbRub = document.getElementById('tabelaRubricas');
+        tbRub.innerHTML = '';
+        rubricas.forEach((r, index) => {
+            tbRub.innerHTML += `<tr>
+                <td>${r.num}</td>
+                <td>${r.desc}</td>
+                <td>${r.tipo}</td>
+                <td>${r.calculo}</td>
+                <td>${r.inss}</td>
+                <td>${r.irrf}</td>
+                <td>
+                    <button onclick="editarRubrica(${index})" style="background:#3b82f6; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer; margin-right:4px;">Editar</button>
+                    <button onclick="excluirRubrica(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button>
+                </td>
+            </tr>`;
+        });
+
+        let selectAddRub = document.getElementById('selectAdicionarRubrica');
+        selectAddRub.innerHTML = '<option value="">Selecione a rubrica...</option>';
+        rubricas.forEach((r, index) => {
+            selectAddRub.innerHTML += `<option value="${index}">${r.num} - ${r.desc} (${r.tipo})</option>`;
+        });
+    }
+
+    function carregarFuncionarioSelecionado() {
+        let idx = document.getElementById('filtroFuncionario').value;
+        if(idx === "") {
+            document.getElementById('lancSalarioBase').value = "";
+            return;
+        }
+        let f = funcionarios[idx];
+        document.getElementById('lancSalarioBase').value = f.salario.toFixed(2);
+        lancamentosAtivos = {};
+        document.getElementById('containerLancamentosRubricas').innerHTML = "";
+        calcularFolha();
+    }
+
+    function adicionarRubricaLancamento() {
+        let idxRub = document.getElementById('selectAdicionarRubrica').value;
+        if(idxRub === "") { alert("Selecione uma rubrica!"); return; }
+        let r = rubricas[idxRub];
+
+        if(lancamentosAtivos[r.num]) { alert("Esta rubrica já foi adicionada!"); return; }
+
+        lancamentosAtivos[r.num] = {
+            desc: r.desc,
+            tipo: r.tipo,
+            calculo: r.calculo,
+            inss: r.inss,
+            irrf: r.irrf,
+            valor: 0,
+            qtdHoras: 0
+        };
+
+        renderizarLancamentosRubricas();
+        calcularFolha();
+    }
+
+    function removerRubricaLancamento(num) {
+        delete lancamentosAtivos[num];
+        renderizarLancamentosRubricas();
+        calcularFolha();
+    }
+
+    function renderizarLancamentosRubricas() {
+        let container = document.getElementById('containerLancamentosRubricas');
+        container.innerHTML = "";
+
+        for(let num in lancamentosAtivos) {
+            let item = lancamentosAtivos[num];
+            let htmlInput = "";
+
+            if(item.calculo === 'manual') {
+                htmlInput = `<div class="form-group" style="flex:1; margin:0;"><label>Valor (R$)</label><input type="number" step="0.01" value="${item.valor}" oninput="atualizarValorRubrica('${num}', this.value)"></div>`;
+            } else {
+                htmlInput = `<div class="form-group" style="flex:1; margin:0;"><label>Quantidade de Horas</label><input type="number" step="0.5" value="${item.qtdHoras}" oninput="atualizarQtdHoras('${num}', this.value)"></div>`;
+            }
+
+            container.innerHTML += `
+                <div style="display: flex; gap: 10px; align-items: center; background: #f1f5f9; padding: 12px; border-radius: 8px; margin-bottom: 10px;">
+                    <div style="flex: 2; font-size: 0.9rem;"><strong>${num} - ${item.desc}</strong> (${item.tipo})</div>
+                    ${htmlInput}
+                    <button onclick="removerRubricaLancamento('${num}')" style="background:#ef4444; color:white; border:none; padding:8px 12px; border-radius:6px; cursor:pointer; height: 42px; margin-top: 18px;">🗑️</button>
+                </div>
+            `;
+        }
+    }
+
+    function atualizarValorRubrica(num, val) {
+        if(lancamentosAtivos[num]) {
+            lancamentosAtivos[num].valor = parseFloat(val) || 0;
+            calcularFolha();
+        }
+    }
+
+    function atualizarQtdHoras(num, val) {
+        if(lancamentosAtivos[num]) {
+            lancamentosAtivos[num].qtdHoras = parseFloat(val) || 0;
+            calcularFolha();
+        }
+    }
+
+    function calcularInss(salarioBase) {
+        let inss = 0;
+        if (salarioBase <= 1518.00) {
+            inss = salarioBase * 0.075;
+        } else if (salarioBase <= 2793.88) {
+            inss = (1518.00 * 0.075) + ((salarioBase - 1518.00) * 0.09);
+        } else if (
