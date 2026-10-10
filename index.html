@@ -353,7 +353,7 @@
 </head>
 <body>
 
-    <!-- TELA DE LOGIN CORRIGIDA -->
+    <!-- TELA DE LOGIN -->
     <div id="telaLogin">
         <div class="login-card">
             <h2>AMF SISTEMA-DP</h2>
@@ -572,8 +572,9 @@
     ];
 
     function verificarSenha() {
-        let senha = document.getElementById('inputSenha').value.trim();
-        if (senha === "0" || senha === 0) {
+        let senha = document.getElementById('inputSenha').value.toString().trim();
+        // Aceita qualquer formato de 0 digitado
+        if (senha === "0" || senha === "") {
             document.getElementById('telaLogin').style.display = 'none';
             document.getElementById('sistemaPrincipal').style.display = 'block';
             atualizarTelas();
@@ -603,4 +604,218 @@
 
         if(!nome) { alert("Informe o nome do funcionário!"); return; }
 
-        funcionarios.push({ nome
+        funcionarios.push({ nome, cpf, cargo, salario });
+        localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
+        atualizarTelas();
+        alert("Funcionário cadastrado com sucesso!");
+        document.getElementById('cadNome').value = '';
+        document.getElementById('cadCpf').value = '';
+        document.getElementById('cadCargo').value = '';
+    }
+
+    function excluirFuncionario(index) {
+        funcionarios.splice(index, 1);
+        localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
+        atualizarTelas();
+    }
+
+    function adicionarRubrica() {
+        let num = document.getElementById('rubNum').value;
+        let desc = document.getElementById('rubDesc').value;
+        let tipo = document.getElementById('rubTipo').value;
+        let inss = document.getElementById('rubInss').value;
+        let irrf = document.getElementById('rubIrrf').value;
+        let ferias = document.getElementById('rubFerias').value;
+        let c13 = document.getElementById('rub13').value;
+
+        if(!num || !desc) { alert("Preencha o número e a descrição da rubrica!"); return; }
+
+        rubricas.push({ num, desc, tipo, inss, irrf, ferias, c13 });
+        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+        atualizarTelas();
+        alert("Rubrica cadastrada com sucesso!");
+        document.getElementById('rubNum').value = '';
+        document.getElementById('rubDesc').value = '';
+    }
+
+    function excluirRubrica(index) {
+        rubricas.splice(index, 1);
+        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+        atualizarTelas();
+    }
+
+    function atualizarTelas() {
+        let tbFunc = document.getElementById('tabelaFuncionarios');
+        tbFunc.innerHTML = '';
+        let selectFiltro = document.getElementById('filtroFuncionario');
+        selectFiltro.innerHTML = '<option value="">Selecione o funcionário...</option>';
+
+        funcionarios.forEach((f, index) => {
+            tbFunc.innerHTML += `<tr>
+                <td>${f.nome}</td>
+                <td>${f.cpf || '-'}</td>
+                <td>${f.cargo}</td>
+                <td>R$ ${f.salario.toFixed(2)}</td>
+                <td><button onclick="excluirFuncionario(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button></td>
+            </tr>`;
+            selectFiltro.innerHTML += `<option value="${index}">${f.nome} - ${f.cargo}</option>`;
+        });
+
+        let tbRub = document.getElementById('tabelaRubricas');
+        tbRub.innerHTML = '';
+        rubricas.forEach((r, index) => {
+            tbRub.innerHTML += `<tr>
+                <td>${r.num}</td>
+                <td>${r.desc}</td>
+                <td>${r.tipo}</td>
+                <td>${r.inss}</td>
+                <td>${r.irrf}</td>
+                <td>${r.ferias}</td>
+                <td>${r.c13}</td>
+                <td><button onclick="excluirRubrica(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button></td>
+            </tr>`;
+        });
+    }
+
+    function carregarFuncionarioSelecionado() {
+        let index = document.getElementById('filtroFuncionario').value;
+        if(index === "") return;
+        let f = funcionarios[index];
+        document.getElementById('lancSalarioBase').value = f.salario;
+        calcularFolha();
+    }
+
+    function formatarMoeda(valor) {
+        return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+    }
+
+    function calcularINSS(salarioBruto) {
+        let inss = 0;
+        if (salarioBruto <= 1412.00) {
+            inss = salarioBruto * 0.075;
+        } else if (salarioBruto <= 2666.68) {
+            inss = (1412.00 * 0.075) + ((salarioBruto - 1412.00) * 0.09);
+        } else if (salarioBruto <= 4000.03) {
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((salarioBruto - 2666.68) * 0.12);
+        } else if (salarioBruto <= 7786.02) {
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((4000.03 - 2666.68) * 0.12) + ((salarioBruto - 4000.03) * 0.14);
+        } else {
+            inss = 908.86;
+        }
+        return inss;
+    }
+
+    function calcularIRRF(baseCalculo) {
+        let irrf = 0;
+        if (baseCalculo <= 2259.20) {
+            irrf = 0;
+        } else if (baseCalculo <= 2826.65) {
+            irrf = (baseCalculo * 0.075) - 169.44;
+        } else if (baseCalculo <= 3751.05) {
+            irrf = (baseCalculo * 0.15) - 381.44;
+        } else if (baseCalculo <= 4664.68) {
+            irrf = (baseCalculo * 0.225) - 662.77;
+        } else {
+            irrf = (baseCalculo * 0.275) - 896.00;
+        }
+        return irrf < 0 ? 0 : irrf;
+    }
+
+    function calcularFolha() {
+        let index = document.getElementById('filtroFuncionario').value;
+        let nome = "Colaborador Exemplo";
+        let cargo = "Assistente";
+
+        if(index !== "" && funcionarios[index]) {
+            nome = funcionarios[index].nome;
+            cargo = funcionarios[index].cargo;
+        }
+
+        let salarioBase = parseFloat(document.getElementById('lancSalarioBase').value) || 0;
+        let qtdHE = parseFloat(document.getElementById('lancHE').value) || 0;
+        let qtdFaltas = parseFloat(document.getElementById('lancFaltas').value) || 0;
+        let outrosProventos = parseFloat(document.getElementById('lancOutros').value) || 0;
+
+        let valorHora = salarioBase / 220;
+        let valorHE = qtdHE * (valorHora * 1.5);
+        let valorFaltas = qtdFaltas * valorHora;
+
+        let totalProventos = salarioBase + valorHE + outrosProventos;
+        let baseInss = totalProventos - valorFaltas;
+        let valorInss = calcularINSS(baseInss);
+
+        let baseIrrf = baseInss - valorInss;
+        let valorIrrf = calcularIRRF(baseIrrf);
+
+        let totalDescontos = valorFaltas + valorInss + valorIrrf;
+        let valorLiquido = totalProventos - totalDescontos;
+
+        document.getElementById('outNome').textContent = nome;
+        document.getElementById('outCargo').textContent = cargo;
+
+        document.getElementById('resSalarioBase').textContent = formatarMoeda(salarioBase);
+        document.getElementById('resHorasExtras').textContent = formatarMoeda(valorHE);
+        document.getElementById('resOutrosProventos').textContent = formatarMoeda(outrosProventos);
+        document.getElementById('resTotalProventos').textContent = formatarMoeda(totalProventos);
+
+        document.getElementById('resDescFaltas').textContent = formatarMoeda(valorFaltas);
+        document.getElementById('resInss').textContent = formatarMoeda(valorInss);
+        document.getElementById('resIrrf').textContent = formatarMoeda(valorIrrf);
+        document.getElementById('resTotalDescontos').textContent = formatarMoeda(totalDescontos);
+
+        document.getElementById('resValorLiquido').textContent = formatarMoeda(valorLiquido);
+    }
+
+    function salvarNoJobsIn() {
+        if(!BIN_ID) {
+            let bin = prompt("Digite o ID do seu Bin do JSONBin:");
+            if(!bin) return;
+            window.BIN_ID_DADO = bin;
+        } else {
+            window.BIN_ID_DADO = BIN_ID;
+        }
+
+        let dadosGerais = { funcionarios, rubricas };
+
+        fetch(`https://api.jsonbin.io/v3/b/${window.BIN_ID_DADO}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': API_KEY || prompt("Digite sua X-Master-Key do JSONBin:")
+            },
+            body: JSON.stringify(dadosGerais)
+        })
+        .then(response => response.json())
+        .then(result => {
+            alert("Dados e cadastros salvos com sucesso no JSONBin!");
+        })
+        .catch(error => {
+            alert("Erro ao salvar: " + error);
+        });
+    }
+
+    function carregarDoJobsIn() {
+        if(!BIN_ID) return;
+        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
+            headers: { 'X-Master-Key': API_KEY }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data && data.record) {
+                if(data.record.funcionarios) {
+                    funcionarios = data.record.funcionarios;
+                    localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
+                }
+                if(data.record.rubricas) {
+                    rubricas = data.record.rubricas;
+                    localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+                }
+                atualizarTelas();
+            }
+        })
+        .catch(err => console.log("Erro ao carregar do JSONBin"));
+    }
+</script>
+
+</body>
+</html>
