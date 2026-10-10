@@ -29,7 +29,7 @@
             padding: 24px 16px;
         }
 
-        /* TELA DE LOGIN COM A SUA IMAGEM PERSONALIZADA */
+        /* TELA DE LOGIN COM A SUA MARCA VISUAL */
         #telaLogin {
             position: fixed;
             top: 0;
@@ -339,14 +339,14 @@
 </head>
 <body>
 
-    <!-- TELA DE LOGIN COM A SUA MARCA VISUAL -->
+    <!-- TELA DE LOGIN -->
     <div id="telaLogin">
         <div class="login-card">
             <h2>AMF SISTEMA-DP</h2>
             <p>Sistema de Departamento Pessoal</p>
-            <input type="password" id="inputSenha" placeholder="Digite a senha (0)" onkeypress="checarEnter(event)" autofocus>
+            <input type="password" id="inputSenha" placeholder="Digite sua senha" onkeypress="checarEnter(event)" autofocus>
             <button onclick="verificarSenha()">Entrar no Sistema</button>
-            <div id="msgErro" class="erro-senha">Senha incorreta! Digite 0.</div>
+            <div id="msgErro" class="erro-senha">Senha incorreta! Tente novamente.</div>
         </div>
     </div>
 
@@ -538,17 +538,7 @@
 
         document.getElementById('resSalarioBase').textContent = formatarMoeda(salarioBase);
         document.getElementById('resHorasExtras').textContent = formatarMoeda(valorHE);
-        document.getElementById('resOutrosProventos').textContent = formatarMoeda(outrosProventos);
-        document.getElementById('resTotalProventos').textContent = formatarMo_proventos = formatarMoeda(totalProventos);
-
-        document.getElementById('resDescFaltas').textContent = formatarMoeda(valorFaltas);
-        document.getElementById('resInss').textContent = formatarMoeda(valorInss);
-        document.getElementById('resIrrf').textContent = formatarMoeda(valorIrrf);
-        document.getElementById('resTotalDescontos').textContent = formatarMoeda(totalDescontos);
-
-        document.getElementById('resValorLiquido').textContent = formatarMoeda(valorLiquido);
-    }
-</script>
-
-</body>
-</html>
+        document.getElementById('resOutrosPro
+    
+    
+ 
