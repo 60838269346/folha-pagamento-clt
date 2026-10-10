@@ -83,12 +83,6 @@
             letter-spacing: 2px;
         }
 
-        .login-card input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
-        }
-
         .login-card button {
             width: 100%;
             padding: 12px;
@@ -114,13 +108,13 @@
             font-weight: 600;
         }
 
-        /* SISTEMA PRINCIPAL (INICIALMENTE OCULTO) */
+        /* SISTEMA PRINCIPAL */
         #sistemaPrincipal {
             display: none;
         }
 
         .container {
-            max-width: 900px;
+            max-width: 1000px;
             margin: 0 auto;
         }
 
@@ -141,7 +135,6 @@
             font-weight: 800;
             margin: 0;
             color: var(--primary);
-            letter-spacing: -0.5px;
         }
 
         .badge-sistema {
@@ -152,6 +145,37 @@
             border-radius: 20px;
             font-weight: 700;
             text-transform: uppercase;
+        }
+
+        /* ABAS DO SISTEMA */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            border: none;
+            background: #e2e8f0;
+            color: var(--text-muted);
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        .tab-btn.active {
+            background: var(--primary);
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
         }
 
         .card {
@@ -169,11 +193,7 @@
             margin-top: 0;
             margin-bottom: 20px;
             color: var(--text-main);
-            display: flex;
-            align-items: center;
-            gap: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .form-grid {
@@ -200,20 +220,13 @@
             color: var(--text-muted);
         }
 
-        .form-group input {
+        .form-group input, .form-group select {
             padding: 11px 14px;
             border: 1px solid var(--border-color);
             border-radius: 8px;
             font-size: 0.95rem;
             background-color: #f8fafc;
             color: var(--text-main);
-        }
-
-        .form-group input:focus {
-            outline: none;
-            border-color: var(--accent);
-            background-color: #fff;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
 
         .btn-acao {
@@ -240,8 +253,25 @@
         .btn-jobs {
             background-color: #0d9488;
         }
-        .btn-jobs:hover {
-            background-color: #0f766e;
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9rem;
+        }
+
+        table th, table td {
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            text-align: left;
+        }
+
+        table th {
+            background: #f1f5f9;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-size: 0.75rem;
         }
 
         .resultado-grid {
@@ -268,7 +298,6 @@
             border-bottom: 2px solid var(--border-color);
             padding-bottom: 8px;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         .linha-valor {
@@ -278,22 +307,12 @@
             font-size: 0.9rem;
         }
 
-        .linha-valor span:first-child {
-            color: var(--text-muted);
-        }
-
-        .linha-valor span:last-child {
-            font-weight: 600;
-            color: var(--text-main);
-        }
-
         .linha-valor.total {
             font-weight: 700;
             font-size: 1rem;
             border-top: 1px dashed var(--border-color);
             padding-top: 10px;
             margin-top: 10px;
-            color: var(--text-main);
         }
 
         .liquido-box {
@@ -310,7 +329,6 @@
             font-size: 0.8rem;
             color: var(--success-text);
             text-transform: uppercase;
-            letter-spacing: 1px;
             font-weight: 700;
         }
 
@@ -330,16 +348,6 @@
             border-radius: 8px;
             margin-bottom: 20px;
             font-size: 0.9rem;
-        }
-
-        .info-funcionario strong {
-            color: var(--primary);
-        }
-
-        @media print {
-            body { background: white; padding: 0; }
-            #telaLogin, .card:not(#cardResultado), .form-grid, .btn-acao, header { display: none !important; }
-            .card { border: none; box-shadow: none; padding: 0; }
         }
     </style>
 </head>
@@ -367,124 +375,315 @@
                 <div class="badge-sistema">Ativo</div>
             </header>
 
-            <div class="card">
-                <h2>📋 Dados do Funcionário e Lançamentos</h2>
-                <div class="form-grid">
-                    <div class="form-group full-width">
-                        <label for="nomeFuncionario">Nome do Funcionário</label>
-                        <input type="text" id="nomeFuncionario" value="Colaborador Exemplo" placeholder="Digite o nome completo">
-                    </div>
-                    <div class="form-group">
-                        <label for="cargoFuncionario">Cargo / Função</label>
-                        <input type="text" id="cargoFuncionario" value="Assistente Administrativo" placeholder="Ex: Analista, Auxiliar...">
-                    </div>
-                    <div class="form-group">
-                        <label for="salarioBase">Salário Base (R$)</label>
-                        <input type="number" id="salarioBase" value="2200.00" step="0.01">
-                    </div>
-                    <div class="form-group">
-                        <label for="horasExtras">Horas Extras 50% (Qtd Horas)</label>
-                        <input type="number" id="horasExtras" value="10" step="0.5">
-                    </div>
-                    <div class="form-group">
-                        <label for="faltasAtrasos">Faltas / Atrasos (Qtd Horas)</label>
-                        <input type="number" id="faltasAtrasos" value="0" step="0.5">
-                    </div>
-                    <div class="form-group">
-                        <label for="outrosProventos">Outros Proventos / Bônus (R$)</label>
-                        <input type="number" id="outrosProventos" value="0.00" step="0.01">
-                    </div>
-                </div>
-                <button class="btn-acao" onclick="calcularFolha()">🧮 Calcular Holerite</button>
-                <button class="btn-acao btn-jobs" onclick="salvarNoJobsIn()">☁️ Salvar no JSONBin (Jobsin)</button>
+            <!-- ABAS DE NAVEGAÇÃO -->
+            <div class="tabs">
+                <button class="tab-btn active" onclick="mudarAba('funcionarios')">1. Funcionários</button>
+                <button class="tab-btn" onclick="mudarAba('rubricas')">2. Rubricas</button>
+                <button class="tab-btn" onclick="mudarAba('lancamentos')">3. Lançamentos & Holerite</button>
             </div>
 
-            <div class="card" id="cardResultado">
-                <h2>📄 Demonstrativo de Pagamento (Holerite)</h2>
-                
-                <div class="info-funcionario">
-                    <div>Funcionário: <strong id="outNome">Colaborador Exemplo</strong></div>
-                    <div>Cargo: <strong id="outCargo">Assistente Administrativo</strong></div>
-                </div>
-
-                <div class="resultado-grid">
-                    <!-- Proventos -->
-                    <div class="bloco-resumo">
-                        <h3>(+) Proventos (Vencimentos)</h3>
-                        <div class="linha-valor">
-                            <span>Salário Base (220h):</span>
-                            <span id="resSalarioBase">R$ 0,00</span>
+            <!-- ABA 1: FUNCIONÁRIOS -->
+            <div id="aba-funcionarios" class="tab-content active">
+                <div class="card">
+                    <h2>👥 Cadastro de Funcionários</h2>
+                    <div class="form-grid">
+                        <div class="form-group full-width">
+                            <label>Nome Completo</label>
+                            <input type="text" id="cadNome" placeholder="Ex: João da Silva">
                         </div>
-                        <div class="linha-valor">
-                            <span>Horas Extras (50%):</span>
-                            <span id="resHorasExtras">R$ 0,00</span>
+                        <div class="form-group">
+                            <label>CPF</label>
+                            <input type="text" id="cadCpf" placeholder="000.000.000-00">
                         </div>
-                        <div class="linha-valor">
-                            <span>Outros Proventos:</span>
-                            <span id="resOutrosProventos">R$ 0,00</span>
+                        <div class="form-group">
+                            <label>Cargo / Função</label>
+                            <input type="text" id="cadCargo" placeholder="Ex: Analista">
                         </div>
-                        <div class="linha-valor total">
-                            <span>Total de Proventos:</span>
-                            <span id="resTotalProventos">R$ 0,00</span>
+                        <div class="form-group">
+                            <label>Salário Base (R$)</label>
+                            <input type="number" id="cadSalario" step="0.01" value="2200.00">
                         </div>
                     </div>
-
-                    <!-- Descontos -->
-                    <div class="bloco-resumo">
-                        <h3>(-) Descontos</h3>
-                        <div class="linha-valor">
-                            <span>Desconto Faltas/Atrasos:</span>
-                            <span id="resDescFaltas">R$ 0,00</span>
-                        </div>
-                        <div class="linha-valor">
-                            <span>INSS:</span>
-                            <span id="resInss">R$ 0,00</span>
-                        </div>
-                        <div class="linha-valor">
-                            <span>IRRF:</span>
-                            <span id="resIrrf">R$ 0,00</span>
-                        </div>
-                        <div class="linha-valor total">
-                            <span>Total de Descontos:</span>
-                            <span id="resTotalDescontos">R$ 0,00</span>
-                        </div>
-                    </div>
+                    <button class="btn-acao" onclick="adicionarFuncionario()">➕ Cadastrar Funcionário</button>
                 </div>
 
-                <div class="liquido-box">
-                    <h3>Valor Líquido a Receber</h3>
-                    <div class="valor-liquido" id="resValorLiquido">R$ 0,00</div>
+                <div class="card">
+                    <h2>📋 Funcionários Cadastrados</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Nome</th>
+                                <th>CPF</th>
+                                <th>Cargo</th>
+                                <th>Salário Base</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaFuncionarios">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
                 </div>
-
-                <button class="btn-acao" style="margin-top: 20px; background-color: #059669;" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
             </div>
+
+            <!-- ABA 2: RUBRICAS -->
+            <div id="aba-rubricas" class="tab-content">
+                <div class="card">
+                    <h2>⚙️ Cadastro de Rubricas</h2>
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Número da Rubrica</label>
+                            <input type="text" id="rubNum" placeholder="Ex: 001">
+                        </div>
+                        <div class="form-group">
+                            <label>Descrição</label>
+                            <input type="text" id="rubDesc" placeholder="Ex: Horas Extras 50%">
+                        </div>
+                        <div class="form-group">
+                            <label>Tipo</label>
+                            <select id="rubTipo">
+                                <option value="Provento">Provento (+)</option>
+                                <option value="Desconto">Desconto (-)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Incidir INSS</label>
+                            <select id="rubInss"><option value="Sim">Sim</option><option value="Nao">Não</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Incidir IRRF</label>
+                            <select id="rubIrrf"><option value="Sim">Sim</option><option value="Nao">Não</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Base para Férias</label>
+                            <select id="rubFerias"><option value="Sim">Sim</option><option value="Nao">Não</option></select>
+                        </div>
+                        <div class="form-group">
+                            <label>Base para 13º</label>
+                            <select id="rub13"><option value="Sim">Sim</option><option value="Nao">Não</option></select>
+                        </div>
+                    </div>
+                    <button class="btn-acao" onclick="adicionarRubrica()">➕ Cadastrar Rubrica</button>
+                </div>
+
+                <div class="card">
+                    <h2>📑 Tabela de Rubricas</h2>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Núm</th>
+                                <th>Descrição</th>
+                                <th>Tipo</th>
+                                <th>INSS</th>
+                                <th>IRRF</th>
+                                <th>Férias</th>
+                                <th>13º</th>
+                                <th>Ação</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabelaRubricas">
+                            <!-- Preenchido via JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- ABA 3: LANÇAMENTOS E HOLERITE -->
+            <div id="aba-lancamentos" class="tab-content">
+                <div class="card">
+                    <h2>📊 Lançamentos da Folha de Pagamento</h2>
+                    <div class="form-group full-width" style="margin-bottom: 16px;">
+                        <label>Selecionar Funcionário</label>
+                        <select id="filtroFuncionario" onchange="carregarFuncionarioSelecionado()">
+                            <option value="">Selecione o funcionário...</option>
+                        </select>
+                    </div>
+
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label>Salário Base (R$)</label>
+                            <input type="number" id="lancSalarioBase" step="0.01" oninput="calcularFolha()">
+                        </div>
+                        <div class="form-group">
+                            <label>Horas Extras 50% (Qtd Horas)</label>
+                            <input type="number" id="lancHE" step="0.5" value="0" oninput="calcularFolha()">
+                        </div>
+                        <div class="form-group">
+                            <label>Faltas / Atrasos (Qtd Horas)</label>
+                            <input type="number" id="lancFaltas" step="0.5" value="0" oninput="calcularFolha()">
+                        </div>
+                        <div class="form-group">
+                            <label>Outros Proventos / Bônus (R$)</label>
+                            <input type="number" id="lancOutros" step="0.01" value="0.00" oninput="calcularFolha()">
+                        </div>
+                    </div>
+                    <button class="btn-acao btn-jobs" onclick="salvarNoJobsIn()">☁️ Salvar Dados no JSONBin</button>
+                </div>
+
+                <div class="card" id="cardResultado">
+                    <h2>📄 Demonstrativo de Pagamento (Holerite)</h2>
+                    
+                    <div class="info-funcionario">
+                        <div>Funcionário: <strong id="outNome">Selecione acima</strong></div>
+                        <div>Cargo: <strong id="outCargo">-</strong></div>
+                    </div>
+
+                    <div class="resultado-grid">
+                        <div class="bloco-resumo">
+                            <h3>(+) Proventos (Vencimentos)</h3>
+                            <div class="linha-valor"><span>Salário Base (220h):</span> <span id="resSalarioBase">R$ 0,00</span></div>
+                            <div class="linha-valor"><span>Horas Extras (50%):</span> <span id="resHorasExtras">R$ 0,00</span></div>
+                            <div class="linha-valor"><span>Outros Proventos:</span> <span id="resOutrosProventos">R$ 0,00</span></div>
+                            <div class="linha-valor total"><span>Total de Proventos:</span> <span id="resTotalProventos">R$ 0,00</span></div>
+                        </div>
+
+                        <div class="bloco-resumo">
+                            <h3>(-) Descontos</h3>
+                            <div class="linha-valor"><span>Desconto Faltas/Atrasos:</span> <span id="resDescFaltas">R$ 0,00</span></div>
+                            <div class="linha-valor"><span>INSS:</span> <span id="resInss">R$ 0,00</span></div>
+                            <div class="linha-valor"><span>IRRF:</span> <span id="resIrrf">R$ 0,00</span></div>
+                            <div class="linha-valor total"><span>Total de Descontos:</span> <span id="resTotalDescontos">R$ 0,00</span></div>
+                        </div>
+                    </div>
+
+                    <div class="liquido-box">
+                        <h3>Valor Líquido a Receber</h3>
+                        <div class="valor-liquido" id="resValorLiquido">R$ 0,00</div>
+                    </div>
+
+                    <button class="btn-acao" style="margin-top: 20px; background-color: #059669;" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+                </div>
+            </div>
+
         </div>
     </div>
 
 <script>
-    // CONFIGURAÇÃO DO JSONBIN (JOBSIN)
-    // Se quiser, você pode preencher o seu Bin ID e Master Key aqui ou deixar para digitar se preferir:
-    const BIN_ID = ""; // Cole o ID do seu Bin do JSONBin aqui entre as aspas, ex: "6458..."
-    const API_KEY = ""; // Cole a sua X-Master-Key aqui entre as aspas se necessário
+    const BIN_ID = ""; 
+    const API_KEY = ""; 
+
+    let funcionarios = JSON.parse(localStorage.getItem('amf_funcionarios')) || [
+        { nome: "Colaborador Exemplo", cpf: "000.000.000-00", cargo: "Assistente Administrativo", salario: 2200.00 }
+    ];
+
+    let rubricas = JSON.parse(localStorage.getItem('amf_rubricas')) || [
+        { num: "001", desc: "Salário Base", tipo: "Provento", inss: "Sim", irrf: "Sim", ferias: "Sim", c13: "Sim" },
+        { num: "002", desc: "Horas Extras 50%", tipo: "Provento", inss: "Sim", irrf: "Sim", ferias: "Sim", c13: "Sim" }
+    ];
 
     function verificarSenha() {
         let senha = document.getElementById('inputSenha').value.trim();
         if (senha === "0") {
             document.getElementById('telaLogin').style.display = 'none';
             document.getElementById('sistemaPrincipal').style.display = 'block';
-            calcularFolha();
+            atualizarTelas();
             carregarDoJobsIn();
         } else {
-            let msg = document.getElementById('msgErro');
-            msg.style.display = 'block';
+            document.getElementById('msgErro').style.display = 'block';
             document.getElementById('inputSenha').value = '';
         }
     }
 
     function checarEnter(event) {
-        if (event.key === 'Enter') {
-            verificarSenha();
-        }
+        if (event.key === 'Enter') verificarSenha();
+    }
+
+    function mudarAba(abaId) {
+        document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+        document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+        document.getElementById('aba-' + abaId).classList.add('active');
+        event.currentTarget.classList.add('active');
+    }
+
+    function adicionarFuncionario() {
+        let nome = document.getElementById('cadNome').value;
+        let cpf = document.getElementById('cadCpf').value;
+        let cargo = document.getElementById('cadCargo').value;
+        let salario = parseFloat(document.getElementById('cadSalario').value) || 0;
+
+        if(!nome) { alert("Informe o nome do funcionário!"); return; }
+
+        funcionarios.push({ nome, cpf, cargo, salario });
+        localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
+        atualizarTelas();
+        alert("Funcionário cadastrado com sucesso!");
+        document.getElementById('cadNome').value = '';
+        document.getElementById('cadCpf').value = '';
+        document.getElementById('cadCargo').value = '';
+    }
+
+    function excluirFuncionario(index) {
+        funcionarios.splice(index, 1);
+        localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
+        atualizarTelas();
+    }
+
+    function adicionarRubrica() {
+        let num = document.getElementById('rubNum').value;
+        let desc = document.getElementById('rubDesc').value;
+        let tipo = document.getElementById('rubTipo').value;
+        let inss = document.getElementById('rubInss').value;
+        let irrf = document.getElementById('rubIrrf').value;
+        let ferias = document.getElementById('rubFerias').value;
+        let c13 = document.getElementById('rub13').value;
+
+        if(!num || !desc) { alert("Preencha o número e a descrição da rubrica!"); return; }
+
+        rubricas.push({ num, desc, tipo, inss, irrf, ferias, c13 });
+        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+        atualizarTelas();
+        alert("Rubrica cadastrada com sucesso!");
+        document.getElementById('rubNum').value = '';
+        document.getElementById('rubDesc').value = '';
+    }
+
+    function excluirRubrica(index) {
+        rubricas.splice(index, 1);
+        localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
+        atualizarTelas();
+    }
+
+    function atualizarTelas() {
+        // Tabela Funcionários
+        let tbFunc = document.getElementById('tabelaFuncionarios');
+        tbFunc.innerHTML = '';
+        let selectFiltro = document.getElementById('filtroFuncionario');
+        selectFiltro.innerHTML = '<option value="">Selecione o funcionário...</option>';
+
+        funcionarios.forEach((f, index) => {
+            tbFunc.innerHTML += `<tr>
+                <td>${f.nome}</td>
+                <td>${f.cpf || '-'}</td>
+                <td>${f.cargo}</td>
+                <td>R$ ${f.salario.toFixed(2)}</td>
+                <td><button onclick="excluirFuncionario(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button></td>
+            </tr>`;
+            selectFiltro.innerHTML += `<option value="${index}">${f.nome} - ${f.cargo}</option>`;
+        });
+
+        // Tabela Rubricas
+        let tbRub = document.getElementById('tabelaRubricas');
+        tbRub.innerHTML = '';
+        rubricas.forEach((r, index) => {
+            tbRub.innerHTML += `<tr>
+                <td>${r.num}</td>
+                <td>${r.desc}</td>
+                <td>${r.tipo}</td>
+                <td>${r.inss}</td>
+                <td>${r.irrf}</td>
+                <td>${r.ferias}</td>
+                <td>${r.c13}</td>
+                <td><button onclick="excluirRubrica(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button></td>
+            </tr>`;
+        });
+    }
+
+    function carregarFuncionarioSelecionado() {
+        let index = document.getElementById('filtroFuncionario').value;
+        if(index === "") return;
+        let f = funcionarios[index];
+        document.getElementById('lancSalarioBase').value = f.salario;
+        calcularFolha();
     }
 
     function formatarMoeda(valor) {
@@ -500,127 +699,4 @@
         } else if (salarioBruto <= 4000.03) {
             inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((salarioBruto - 2666.68) * 0.12);
         } else if (salarioBruto <= 7786.02) {
-            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((4000.03 - 2666.68) * 0.12) + ((salarioBruto - 4000.03) * 0.14);
-        } else {
-            inss = 908.86;
-        }
-        return inss;
-    }
-
-    function calcularIRRF(baseCalculo) {
-        let irrf = 0;
-        if (baseCalculo <= 2259.20) {
-            irrf = 0;
-        } else if (baseCalculo <= 2826.65) {
-            irrf = (baseCalculo * 0.075) - 169.44;
-        } else if (baseCalculo <= 3751.05) {
-            irrf = (baseCalculo * 0.15) - 381.44;
-        } else if (baseCalculo <= 4664.68) {
-            irrf = (baseCalculo * 0.225) - 662.77;
-        } else {
-            irrf = (baseCalculo * 0.275) - 896.00;
-        }
-        return irrf < 0 ? 0 : irrf;
-    }
-
-    function calcularFolha() {
-        let nome = document.getElementById('nomeFuncionario').value || 'Não informado';
-        let cargo = document.getElementById('cargoFuncionario').value || 'Não informado';
-        
-        let salarioBase = parseFloat(document.getElementById('salarioBase').value) || 0;
-        let qtdHE = parseFloat(document.getElementById('horasExtras').value) || 0;
-        let qtdFaltas = parseFloat(document.getElementById('faltasAtrasos').value) || 0;
-        let outrosProventos = parseFloat(document.getElementById('outrosProventos').value) || 0;
-
-        let valorHora = salarioBase / 220;
-        let valorHE = qtdHE * (valorHora * 1.5);
-        let valorFaltas = qtdFaltas * valorHora;
-
-        let totalProventos = salarioBase + valorHE + outrosProventos;
-        let baseInss = totalProventos - valorFaltas;
-        let valorInss = calcularINSS(baseInss);
-
-        let baseIrrf = baseInss - valorInss;
-        let valorIrrf = calcularIRRF(baseIrrf);
-
-        let totalDescontos = valorFaltas + valorInss + valorIrrf;
-        let valorLiquido = totalProventos - totalDescontos;
-
-        document.getElementById('outNome').textContent = nome;
-        document.getElementById('outCargo').textContent = cargo;
-
-        document.getElementById('resSalarioBase').textContent = formatarMoeda(salarioBase);
-        document.getElementById('resHorasExtras').textContent = formatarMoeda(valorHE);
-        document.getElementById('resOutrosProventos').textContent = formatarMoeda(outrosProventos);
-        document.getElementById('resTotalProventos').textContent = formatarMoeda(totalProventos);
-
-        document.getElementById('resDescFaltas').textContent = formatarMoeda(valorFaltas);
-        document.getElementById('resInss').textContent = formatarMoeda(valorInss);
-        document.getElementById('resIrrf').textContent = formatarMoeda(valorIrrf);
-        document.getElementById('resTotalDescontos').textContent = formatarMoeda(totalDescontos);
-
-        document.getElementById('resValorLiquido').textContent = formatarMoeda(valorLiquido);
-    }
-
-    // FUNÇÕES DO JSONBIN
-    function salvarNoJobsIn() {
-        if(!BIN_ID) {
-            let bin = prompt("Digite o ID do seu Bin do JSONBin:");
-            if(!bin) return;
-            window.BIN_ID_DADO = bin;
-        } else {
-            window.BIN_ID_DADO = BIN_ID;
-        }
-
-        let dados = {
-            nome: document.getElementById('nomeFuncionario').value,
-            cargo: document.getElementById('cargoFuncionario').value,
-            salarioBase: document.getElementById('salarioBase').value,
-            horasExtras: document.getElementById('horasExtras').value,
-            faltasAtrasos: document.getElementById('faltasAtrasos').value,
-            outrosProventos: document.getElementById('outrosProventos').value
-        };
-
-        fetch(`https://api.jsonbin.io/v3/b/${window.BIN_ID_DADO}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Master-Key': API_KEY || prompt("Digite sua X-Master-Key do JSONBin:")
-            },
-            body: JSON.stringify(dados)
-        })
-        .then(response => response.json())
-        .then(result => {
-            alert("Dados salvos com sucesso no JSONBin!");
-        })
-        .catch(error => {
-            alert("Erro ao salvar: " + error);
-        });
-    }
-
-    function carregarDoJobsIn() {
-        if(!BIN_ID) return;
-        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-            headers: {
-                'X-Master-Key': API_KEY
-            }
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data && data.record) {
-                let d = data.record;
-                if(d.nome) document.getElementById('nomeFuncionario').value = d.nome;
-                if(d.cargo) document.getElementById('cargoFuncionario').value = d.cargo;
-                if(d.salarioBase) document.getElementById('salarioBase').value = d.salarioBase;
-                if(d.horasExtras) document.getElementById('horasExtras').value = d.horasExtras;
-                if(d.faltasAtrasos) document.getElementById('faltasAtrasos').value = d.faltasAtrasos;
-                if(d.outrosProventos) document.getElementById('outrosProventos').value = d.outrosProventos;
-                calcularFolha();
-            }
-        })
-        .catch(err => console.log("Erro ao carregar dados do JSONBin"));
-    }
-</script>
-
-</body>
-</html>
+            inss = (1412.00 * 0.075) + ((2666.68 - 1412.00) * 0.09) + ((4000.0
