@@ -994,36 +994,3 @@
 
         document.getElementById('resValorLiquido').textContent = formatarMoeda(valorLiquido);
     }
-
-    function salvarNoJobsIn() {
-        if(!BIN_ID) {
-            let bin = prompt("Digite o ID do seu Bin do JSONBin:");
-            if(!bin) return;
-            window.BIN_ID_DADO = bin;
-        } else {
-            window.BIN_ID_DADO = BIN_ID;
-        }
-
-        let dadosGerais = { funcionarios, rubricas };
-
-        fetch(`https://api.jsonbin.io/v3/b/${window.BIN_ID_DADO}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Master-Key': API_KEY || prompt("Digite sua X-Master-Key do JSONBin:")
-            },
-            body: JSON.stringify(dadosGerais)
-        })
-        .then(response => response.json())
-        .then(result => {
-            alert("Dados e cadastros salvos com sucesso no JSONBin!");
-        })
-        .catch(error => {
-            alert("Erro ao salvar: " + error);
-        });
-    }
-
-    function carregarDoJobsIn() {
-        if(!BIN_ID) return;
-        fetch(`https://api.jsonbin.io/v3/b/${BIN_ID}/latest`, {
-            headers: { 'X-Master-Key': API_KEY }
