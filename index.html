@@ -6,61 +6,194 @@
     <title>AMF SISTEMA-DP</title>
     <style>
         :root {
-            --bg-color: #f1f5f9;
+            --bg-body: #f8fafc;
             --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #475569;
-            --primary: #2563eb;
-            --primary-hover: #1d4ed8;
-            --success: #10b981;
-            --danger: #ef4444;
-            --border: #cbd5e1;
-            --radius: 8px;
-            --shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.05);
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --primary: #1e40af;
+            --primary-hover: #1e3a8a;
+            --accent: #3b82f6;
+            --success-bg: #ecfdf5;
+            --success-text: #047857;
+            --success-border: #a7f3d0;
+            --border-color: #e2e8f0;
+            --radius: 12px;
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
         }
+
         body {
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background-color: var(--bg-color);
+            background-color: var(--bg-body);
             color: var(--text-main);
             margin: 0;
+            padding: 24px 16px;
+        }
+
+        /* TELA DE LOGIN COM A SUA IMAGEM PERSONALIZADA */
+        #telaLogin {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: linear-gradient(rgba(15, 23, 42, 0.65), rgba(15, 23, 42, 0.8)), url('https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1920&q=80') no-repeat center center;
+            background-size: cover;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
             padding: 16px;
         }
+
+        .login-card {
+            background: rgba(255, 255, 255, 0.96);
+            backdrop-filter: blur(12px);
+            padding: 36px 32px;
+            border-radius: 16px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .login-card h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 6px;
+            font-weight: 800;
+        }
+
+        .login-card p {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        .login-card input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1.1rem;
+            text-align: center;
+            margin-bottom: 16px;
+            background: #fff;
+            box-sizing: border-box;
+            letter-spacing: 2px;
+        }
+
+        .login-card input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+        }
+
+        .login-card button {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .login-card button:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .erro-senha {
+            color: #ef4444;
+            font-size: 0.85rem;
+            margin-top: 12px;
+            display: none;
+            font-weight: 600;
+        }
+
+        /* SISTEMA PRINCIPAL (INICIALMENTE OCULTO) */
+        #sistemaPrincipal {
+            display: none;
+        }
+
         .container {
             max-width: 900px;
             margin: 0 auto;
         }
-        h1 {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 16px;
-            color: var(--text-main);
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            background: var(--card-bg);
+            padding: 20px 24px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border-left: 6px solid var(--primary);
         }
+
+        h1 {
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin: 0;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .badge-sistema {
+            font-size: 0.75rem;
+            background: #dbeafe;
+            color: #1d4ed8;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
         .card {
             background: var(--card-bg);
-            border: 1px solid #e2e8f0;
+            border: 1px solid var(--border-color);
             border-radius: var(--radius);
-            padding: 20px;
-            margin-bottom: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
             box-shadow: var(--shadow);
         }
-        h2 {
-            font-size: 1.1rem;
-            font-weight: 600;
+
+        .card h2 {
+            font-size: 1rem;
+            font-weight: 700;
             margin-top: 0;
-            margin-bottom: 16px;
-            border-bottom: 2px solid #f1f5f9;
-            padding-bottom: 8px;
+            margin-bottom: 20px;
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: none;
+            padding-bottom: 0;
         }
+
         .form-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
             gap: 16px;
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
+
         .form-group {
             display: flex;
             flex-direction: column;
         }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
         .form-group label {
             font-size: 0.75rem;
             font-weight: 700;
@@ -68,170 +201,279 @@
             margin-bottom: 6px;
             color: var(--text-muted);
         }
+
         .form-group input {
-            padding: 10px;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 0.9rem;
+            padding: 11px 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.95rem;
             background-color: #f8fafc;
+            color: var(--text-main);
         }
+
         .form-group input:focus {
             outline: none;
-            border-color: var(--primary);
+            border-color: var(--accent);
             background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
         }
-        button {
+
+        .btn-acao {
             background-color: var(--primary);
             color: white;
             border: none;
-            padding: 10px 20px;
-            border-radius: 6px;
+            padding: 12px 24px;
+            border-radius: 8px;
             font-weight: 600;
+            font-size: 0.95rem;
             cursor: pointer;
             width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
         }
-        button:hover {
+
+        .btn-acao:hover {
             background-color: var(--primary-hover);
         }
+
         .resultado-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 20px;
         }
-        @media(max-width: 600px) {
+
+        @media(max-width: 768px) {
             .resultado-grid { grid-template-columns: 1fr; }
         }
+
         .bloco-resumo {
             background: #f8fafc;
-            border: 1px solid #e2e8f0;
-            border-radius: 6px;
-            padding: 14px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 16px;
         }
+
         .bloco-resumo h3 {
-            font-size: 0.9rem;
+            font-size: 0.85rem;
             margin-top: 0;
             color: var(--text-muted);
-            border-bottom: 1px solid #cbd5e1;
-            padding-bottom: 4px;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
+
         .linha-valor {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 8px;
+            margin-bottom: 10px;
             font-size: 0.9rem;
         }
+
+        .linha-valor span:first-child {
+            color: var(--text-muted);
+        }
+
+        .linha-valor span:last-child {
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
         .linha-valor.total {
-            font-weight: bold;
+            font-weight: 700;
             font-size: 1rem;
-            border-top: 1px dashed #cbd5e1;
-            padding-top: 8px;
-            margin-top: 8px;
+            border-top: 1px dashed var(--border-color);
+            padding-top: 10px;
+            margin-top: 10px;
+            color: var(--text-main);
         }
+
         .liquido-box {
-            background: #ecfdf5;
-            border: 1px solid #a7f3d0;
-            padding: 16px;
-            border-radius: 6px;
+            background: var(--success-bg);
+            border: 1px solid var(--success-border);
+            padding: 20px;
+            border-radius: 8px;
             text-align: center;
-            margin-top: 16px;
+            margin-top: 20px;
         }
+
         .liquido-box h3 {
             margin: 0;
-            font-size: 0.85rem;
-            color: #065f46;
+            font-size: 0.8rem;
+            color: var(--success-text);
             text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
         }
+
         .liquido-box .valor-liquido {
-            font-size: 1.8rem;
-            font-weight: bold;
-            color: #047857;
+            font-size: 2rem;
+            font-weight: 800;
+            color: #065f46;
             margin-top: 4px;
+        }
+
+        .info-funcionario {
+            display: flex;
+            justify-content: space-between;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            padding: 12px 16px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+        }
+
+        .info-funcionario strong {
+            color: var(--primary);
+        }
+
+        @media print {
+            body { background: white; padding: 0; }
+            #telaLogin, .card:not(#cardResultado), .form-grid, .btn-acao, header { display: none !important; }
+            .card { border: none; box-shadow: none; padding: 0; }
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <h1>AMF SISTEMA-DP</h1>
-
-    <div class="card">
-        <h2>Dados do Funcionário e Lançamentos do Mês</h2>
-        <div class="form-grid">
-            <div class="form-group">
-                <label for="salarioBase">Salário Base (R$)</label>
-                <input type="number" id="salarioBase" value="2200.00" step="0.01">
-            </div>
-            <div class="form-group">
-                <label for="horasExtras">Horas Extras 50% (Qtd Horas)</label>
-                <input type="number" id="horasExtras" value="10" step="0.5">
-            </div>
-            <div class="form-group">
-                <label for="faltasAtrasos">Faltas / Atrasos (Qtd Horas)</label>
-                <input type="number" id="faltasAtrasos" value="0" step="0.5">
-            </div>
-            <div class="form-group">
-                <label for="outrosProventos">Outros Proventos / Bônus (R$)</label>
-                <input type="number" id="outrosProventos" value="0.00" step="0.01">
-            </div>
-        </div>
-        <button onclick="calcularFolha()">Calcular Holerite</button>
-    </div>
-
-    <div class="card" id="cardResultado">
-        <h2>Demonstrativo de Pagamento (Holerite)</h2>
-        
-        <div class="resultado-grid">
-            <!-- Proventos -->
-            <div class="bloco-resumo">
-                <h3>(+) Proventos (Vencimentos)</h3>
-                <div class="linha-valor">
-                    <span>Salário Base (220h):</span>
-                    <span id="resSalarioBase">R$ 0,00</span>
-                </div>
-                <div class="linha-valor">
-                    <span>Horas Extras (50%):</span>
-                    <span id="resHorasExtras">R$ 0,00</span>
-                </div>
-                <div class="linha-valor">
-                    <span>Outros Proventos:</span>
-                    <span id="resOutrosProventos">R$ 0,00</span>
-                </div>
-                <div class="linha-valor total">
-                    <span>Total de Proventos:</span>
-                    <span id="resTotalProventos">R$ 0,00</span>
-                </div>
-            </div>
-
-            <!-- Descontos -->
-            <div class="bloco-resumo">
-                <h3>(-) Descontos</h3>
-                <div class="linha-valor">
-                    <span>Desconto Faltas/Atrasos:</span>
-                    <span id="resDescFaltas">R$ 0,00</span>
-                </div>
-                <div class="linha-valor">
-                    <span>INSS:</span>
-                    <span id="resInss">R$ 0,00</span>
-                </div>
-                <div class="linha-valor">
-                    <span>IRRF:</span>
-                    <span id="resIrrf">R$ 0,00</span>
-                </div>
-                <div class="linha-valor total">
-                    <span>Total de Descontos:</span>
-                    <span id="resTotalDescontos">R$ 0,00</span>
-                </div>
-            </div>
-        </div>
-
-        <div class="liquido-box">
-            <h3>Valor Líquido a Receber</h3>
-            <div class="valor-liquido" id="resValorLiquido">R$ 0,00</div>
+    <!-- TELA DE LOGIN COM A SUA MARCA VISUAL -->
+    <div id="telaLogin">
+        <div class="login-card">
+            <h2>AMF SISTEMA-DP</h2>
+            <p>Sistema de Departamento Pessoal</p>
+            <input type="password" id="inputSenha" placeholder="Digite a senha (0)" onkeypress="checarEnter(event)" autofocus>
+            <button onclick="verificarSenha()">Entrar no Sistema</button>
+            <div id="msgErro" class="erro-senha">Senha incorreta! Digite 0.</div>
         </div>
     </div>
-</div>
+
+    <!-- SISTEMA PRINCIPAL -->
+    <div id="sistemaPrincipal">
+        <div class="container">
+            <header>
+                <div>
+                    <h1>AMF SISTEMA-DP</h1>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 2px;">Gestão de Departamento Pessoal &bull; Base 220h</div>
+                </div>
+                <div class="badge-sistema">Ativo</div>
+            </header>
+
+            <div class="card">
+                <h2>📋 Dados do Funcionário e Lançamentos</h2>
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label for="nomeFuncionario">Nome do Funcionário</label>
+                        <input type="text" id="nomeFuncionario" value="Colaborador Exemplo" placeholder="Digite o nome completo">
+                    </div>
+                    <div class="form-group">
+                        <label for="cargoFuncionario">Cargo / Função</label>
+                        <input type="text" id="cargoFuncionario" value="Assistente Administrativo" placeholder="Ex: Analista, Auxiliar...">
+                    </div>
+                    <div class="form-group">
+                        <label for="salarioBase">Salário Base (R$)</label>
+                        <input type="number" id="salarioBase" value="2200.00" step="0.01">
+                    </div>
+                    <div class="form-group">
+                        <label for="horasExtras">Horas Extras 50% (Qtd Horas)</label>
+                        <input type="number" id="horasExtras" value="10" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="faltasAtrasos">Faltas / Atrasos (Qtd Horas)</label>
+                        <input type="number" id="faltasAtrasos" value="0" step="0.5">
+                    </div>
+                    <div class="form-group">
+                        <label for="outrosProventos">Outros Proventos / Bônus (R$)</label>
+                        <input type="number" id="outrosProventos" value="0.00" step="0.01">
+                    </div>
+                </div>
+                <button class="btn-acao" onclick="calcularFolha()">🧮 Calcular Holerite</button>
+            </div>
+
+            <div class="card" id="cardResultado">
+                <h2>📄 Demonstrativo de Pagamento (Holerite)</h2>
+                
+                <div class="info-funcionario">
+                    <div>Funcionário: <strong id="outNome">Colaborador Exemplo</strong></div>
+                    <div>Cargo: <strong id="outCargo">Assistente Administrativo</strong></div>
+                </div>
+
+                <div class="resultado-grid">
+                    <!-- Proventos -->
+                    <div class="bloco-resumo">
+                        <h3>(+) Proventos (Vencimentos)</h3>
+                        <div class="linha-valor">
+                            <span>Salário Base (220h):</span>
+                            <span id="resSalarioBase">R$ 0,00</span>
+                        </div>
+                        <div class="linha-valor">
+                            <span>Horas Extras (50%):</span>
+                            <span id="resHorasExtras">R$ 0,00</span>
+                        </div>
+                        <div class="linha-valor">
+                            <span>Outros Proventos:</span>
+                            <span id="resOutrosProventos">R$ 0,00</span>
+                        </div>
+                        <div class="linha-valor total">
+                            <span>Total de Proventos:</span>
+                            <span id="resTotalProventos">R$ 0,00</span>
+                        </div>
+                    </div>
+
+                    <!-- Descontos -->
+                    <div class="bloco-resumo">
+                        <h3>(-) Descontos</h3>
+                        <div class="linha-valor">
+                            <span>Desconto Faltas/Atrasos:</span>
+                            <span id="resDescFaltas">R$ 0,00</span>
+                        </div>
+                        <div class="linha-valor">
+                            <span>INSS:</span>
+                            <span id="resInss">R$ 0,00</span>
+                        </div>
+                        <div class="linha-valor">
+                            <span>IRRF:</span>
+                            <span id="resIrrf">R$ 0,00</span>
+                        </div>
+                        <div class="linha-valor total">
+                            <span>Total de Descontos:</span>
+                            <span id="resTotalDescontos">R$ 0,00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="liquido-box">
+                    <h3>Valor Líquido a Receber</h3>
+                    <div class="valor-liquido" id="resValorLiquido">R$ 0,00</div>
+                </div>
+
+                <button class="btn-acao" style="margin-top: 20px; background-color: #059669;" onclick="window.print()">🖨️ Imprimir / Salvar PDF</button>
+            </div>
+        </div>
+    </div>
 
 <script>
+    function verificarSenha() {
+        let senha = document.getElementById('inputSenha').value;
+        if (senha === '0') {
+            document.getElementById('telaLogin').style.display = 'none';
+            document.getElementById('sistemaPrincipal').style.display = 'block';
+            calcularFolha();
+        } else {
+            let msg = document.getElementById('msgErro');
+            msg.style.display = 'block';
+            document.getElementById('inputSenha').value = '';
+        }
+    }
+
+    function checarEnter(event) {
+        if (event.key === 'Enter') {
+            verificarSenha();
+        }
+    }
+
     function formatarMoeda(valor) {
         return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
     }
@@ -269,6 +511,9 @@
     }
 
     function calcularFolha() {
+        let nome = document.getElementById('nomeFuncionario').value || 'Não informado';
+        let cargo = document.getElementById('cargoFuncionario').value || 'Não informado';
+        
         let salarioBase = parseFloat(document.getElementById('salarioBase').value) || 0;
         let qtdHE = parseFloat(document.getElementById('horasExtras').value) || 0;
         let qtdFaltas = parseFloat(document.getElementById('faltasAtrasos').value) || 0;
@@ -288,10 +533,13 @@
         let totalDescontos = valorFaltas + valorInss + valorIrrf;
         let valorLiquido = totalProventos - totalDescontos;
 
+        document.getElementById('outNome').textContent = nome;
+        document.getElementById('outCargo').textContent = cargo;
+
         document.getElementById('resSalarioBase').textContent = formatarMoeda(salarioBase);
         document.getElementById('resHorasExtras').textContent = formatarMoeda(valorHE);
         document.getElementById('resOutrosProventos').textContent = formatarMoeda(outrosProventos);
-        document.getElementById('resTotalProventos').textContent = formatarMoeda(totalProventos);
+        document.getElementById('resTotalProventos').textContent = formatarMo_proventos = formatarMoeda(totalProventos);
 
         document.getElementById('resDescFaltas').textContent = formatarMoeda(valorFaltas);
         document.getElementById('resInss').textContent = formatarMoeda(valorInss);
@@ -300,9 +548,8 @@
 
         document.getElementById('resValorLiquido').textContent = formatarMoeda(valorLiquido);
     }
-
-    window.onload = calcularFolha;
 </script>
 
 </body>
 </html>
+  
