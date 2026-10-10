@@ -492,7 +492,7 @@
 
                 <div id="containerLancamentosRubricas"></div>
 
-                <button class="btn-acao btn-jobs" onclick="salvarNoJobsIn()" style="margin-top: 20px;">☁️ Salvar Dados no JSONBin</button>
+                <button class="btn-acao btn-jobs" onclick="salvarNoJobsIn()" style="margin-top: 20px;">💾 Salvar Lançamento</button>
             </div>
 
             <div class="card" id="cardResultado">
@@ -930,7 +930,7 @@
         })
         .then(response => response.json())
         .then(result => {
-            alert("Dados e cadastros salvos com sucesso no JSONBin!");
+            alert("Lançamento salvo com sucesso!");
         })
         .catch(error => {
             alert("Erro ao salvar: " + error);
@@ -947,18 +947,4 @@
             if(data && data.record) {
                 if(data.record.funcionarios) {
                     funcionarios = data.record.funcionarios;
-                    localStorage.setItem('amf_funcionarios', JSON.stringify(funcionarios));
-                }
-                if(data.record.rubricas) {
-                    rubricas = data.record.rubricas;
-                    localStorage.setItem('amf_rubricas', JSON.stringify(rubricas));
-                }
-                atualizarTelas();
-            }
-        })
-        .catch(err => console.log("Erro ao carregar do JSONBin"));
-    }
-</script>
-
-</body>
-</html>
+                    localStorage.setItem('amf_funcionarios',
