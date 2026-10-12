@@ -798,9 +798,9 @@
             let htmlInput = "";
 
             if(item.calculo === 'manual') {
-                htmlInput = `<input type="number" step="0.01" value="${item.valor}" style="width: 140px; padding: 6px 10px;" oninput="atualizarValorRubrica('${num}', this.value)" placeholder="R$ 0,00">`;
+                htmlInput = `<input type="number" id="val_${num}" step="0.01" value="${item.valor}" style="width: 140px; padding: 6px 10px;" oninput="atualizarValorRubrica('${num}', this.value)" placeholder="R$ 0,00">`;
             } else {
-                htmlInput = `<input type="number" step="0.5" value="${item.qtdHoras}" style="width: 140px; padding: 6px 10px;" oninput="atualizarQtdHoras('${num}', this.value)" placeholder="Qtd Horas">`;
+                htmlInput = `<input type="number" id="hrs_${num}" step="0.5" value="${item.qtdHoras}" style="width: 140px; padding: 6px 10px;" oninput="atualizarQtdHoras('${num}', this.value)" placeholder="Qtd Horas">`;
             }
 
             container.innerHTML += `
@@ -886,6 +886,15 @@
 
         for(let num in lancamentosAtivos) {
             let item = lancamentosAtivos[num];
+            
+            if(item.calculo === 'manual') {
+                let elVal = document.getElementById(`val_${num}`);
+                if(elVal) item.valor = parseFloat(elVal.value) || 0;
+            } else {
+                let elHrs = document.getElementById(`hrs_${num}`);
+                if(elHrs) item.qtdHoras = parseFloat(elHrs.value) || 0;
+            }
+
             let valorCalculado = item.valor;
 
             if(item.calculo === 'he60') {
