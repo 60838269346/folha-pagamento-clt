@@ -482,7 +482,6 @@
                     </div>
                 </div>
 
-                <!-- TABELA LIMPA PARA OS LANÇAMENTOS -->
                 <table>
                     <thead>
                         <tr>
@@ -537,13 +536,12 @@
                         <tr>
                             <th>Funcionário</th>
                             <th>Competência</th>
-                            <th>Salário Base</th>
-                            <th>Líquido</th>
+                            <th>Rubricas Lançadas e Valores</th>
                             <th>Ações</th>
                         </tr>
                     </thead>
                     <tbody id="tabelaHistorico">
-                        <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Carregando lançamentos...</td></tr>
+                        <tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Carregando lançamentos...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -951,14 +949,10 @@
         let f = funcionarios[idxFunc];
         let mes = document.getElementById('lancMes').value;
         let ano = document.getElementById('lancAno').value;
-        let salarioBase = parseFloat(document.getElementById('lancSalarioBase').value) || 0;
-        let liquidoStr = document.getElementById('resValorLiquido').innerText;
 
         let novoRegistro = {
             funcionario: f.nome,
             competencia: `${mes}/${ano}`,
-            salarioBase: salarioBase,
-            liquido: liquidoStr,
             lancamentos: { ...lancamentosAtivos }
         };
 
@@ -980,7 +974,7 @@
             renderizarHistorico();
         } catch(e) {
             console.error("Erro ao carregar do JSONBin", e);
-            document.getElementById('tabelaHistorico').innerHTML = `<tr><td colspan="5" style="text-align: center; color: red;">Erro ao carregar histórico.</td></tr>`;
+            document.getElementById('tabelaHistorico').innerHTML = `<tr><td colspan="4" style="text-align: center; color: red;">Erro ao carregar histórico.</td></tr>`;
         }
     }
 
@@ -1016,17 +1010,24 @@
         });
 
         if(filtrados.length === 0) {
-            tb.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">Nenhum lançamento encontrado.</td></tr>`;
+            tb.innerHTML = `<tr><td colspan="4" style="text-align: center; color: var(--text-muted);">Nenhum lançamento encontrado.</td></tr>`;
             return;
         }
 
         filtrados.forEach((item, index) => {
+            let resumoRubricasHtml = "";
+            for(let num in item.lancamentos) {
+                let l = item.lancamentos[num];
+                let detalheVal = l.calculo === 'manual' ? `R$ ${l.valor.toFixed(2)}` : `${l.qtdHoras}h (R$ ${l.valor.toFixed(2)})`;
+                resumoRubricasHtml += `<div>• <strong>${num} - ${l.desc}</strong>: ${detalheVal}</div>`;
+            }
+            if(resumoRubricasHtml === "") resumoRubricasHtml = "Apenas Salário Base";
+
             tb.innerHTML += `<tr>
                 <td>${item.funcionario}</td>
                 <td>${item.competencia}</td>
-                <td>R$ ${item.salarioBase.toFixed(2)}</td>
-                <td><strong>${item.liquido}</strong></td>
-                <td>
+                <td>${resumoRubricasHtml}</td>
+                <td style="text-align: center;">
                     <button onclick="excluirHistorico(${index})" style="background:#ef4444; color:white; border:none; padding:4px 8px; border-radius:4px; cursor:pointer;">Excluir</button>
                 </td>
             </tr>`;
