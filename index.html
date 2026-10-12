@@ -887,6 +887,7 @@
         for(let num in lancamentosAtivos) {
             let item = lancamentosAtivos[num];
             
+            // Lê diretamente dos inputs existentes no DOM para garantir o valor atualizado sem perder o foco
             if(item.calculo === 'manual') {
                 let elVal = document.getElementById(`val_${num}`);
                 if(elVal) item.valor = parseFloat(elVal.value) || 0;
