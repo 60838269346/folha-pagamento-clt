@@ -948,6 +948,18 @@
     async function salvarLancamento() {
         let idxFunc = document.getElementById('filtroFuncionario').value;
         if(idxFunc === "") { alert("Selecione um funcionário para salvar o lançamento!"); return; }
+        
+        for(let num in lancamentosAtivos) {
+            let item = lancamentosAtivos[num];
+            if(item.calculo === 'manual') {
+                let elVal = document.getElementById(`val_${num}`);
+                if(elVal) item.valor = parseFloat(elVal.value) || 0;
+            } else {
+                let elHrs = document.getElementById(`hrs_${num}`);
+                if(elHrs) item.qtdHoras = parseFloat(elHrs.value) || 0;
+            }
+        }
+
         if(Object.keys(lancamentosAtivos).length === 0) { alert("Adicione pelo menos uma rubrica para salvar o lançamento!"); return; }
 
         let f = funcionarios[idxFunc];
